@@ -60,7 +60,7 @@ const LoginPage = () => {
         color="white"
         fontFamily={'Pretendard'}
       >
-        <VStack spacing={4} align="center" mt="-40px" ml={5}>
+        <VStack spacing={4} align="center" mt="-50px" ml={5}>
           <Image
             src={logoImage}
             alt="Chack 로고"
@@ -70,10 +70,6 @@ const LoginPage = () => {
             mb="300"
           />
         </VStack>
-
-        <Text fontSize={['md', 'lg', 'xl']} fontWeight="light" mb={4}>
-          완벽한 사이즈, 완벽한 핏
-        </Text>
 
         {/* 회원가입 버튼 */}
         <Button
@@ -91,9 +87,9 @@ const LoginPage = () => {
         </Button>
 
         <Text fontSize={['xs', 'sm']} fontWeight="light">
-          또는,{' '}
+          아니요,{' '}
           <Link href="#" textDecoration="underline">
-            시작하지 않기
+            둘러볼래요!
           </Link>
         </Text>
       </Box>

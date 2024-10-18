@@ -5,55 +5,55 @@ import {
   HStack,
   Image,
   Text,
-  Button,
-  Grid,
-  GridItem,
   Flex,
+  IconButton,
 } from '@chakra-ui/react';
-import { StarIcon } from '@chakra-ui/icons';
+import { DeleteIcon } from '@chakra-ui/icons';
 
-// 룩 데이터 (실제로는 API에서 가져올 것입니다)
+// 샘플 데이터 (5개만 표시)
 const initialLooks = [
   {
     id: 1,
     title: 'Beige chic winter',
     price: '459 TND',
-    rating: 4,
-    image: 'https://via.placeholder.com/150', // 이미지 경로
+    size: 'US 7',
+    image: 'https://via.placeholder.com/150',
   },
   {
     id: 2,
     title: 'Party shiny red look',
     price: '339 TND',
-    rating: 5,
-    image: 'https://via.placeholder.com/150', // 이미지 경로
+    size: 'US 6',
+    image: 'https://via.placeholder.com/150',
   },
   {
     id: 3,
     title: 'Denim stylish look',
     price: '299 TND',
-    rating: 4,
-    image: 'https://via.placeholder.com/150', // 이미지 경로
+    size: 'US 8',
+    image: 'https://via.placeholder.com/150',
   },
   {
     id: 4,
     title: 'Black biker look',
     price: '399 TND',
-    rating: 5,
-    image: 'https://via.placeholder.com/150', // 이미지 경로
+    size: 'US 9',
+    image: 'https://via.placeholder.com/150',
+  },
+  {
+    id: 5,
+    title: 'Casual blue summer',
+    price: '259 TND',
+    size: 'US 10',
+    image: 'https://via.placeholder.com/150',
   },
 ];
 
 const UserLooks = () => {
-  const [looks, setLooks] = useState(initialLooks); // 초기 데이터 상태
+  const [looks] = useState(initialLooks.slice(0, 5)); // 초기 데이터 상태에서 5개만 표시
 
-  // 별점을 클릭했을 때 실행되는 함수
-  const handleRatingClick = (lookId, newRating) => {
-    // 클릭된 룩의 id에 맞는 rating을 업데이트
-    const updatedLooks = looks.map((look) =>
-      look.id === lookId ? { ...look, rating: newRating } : look
-    );
-    setLooks(updatedLooks); // 상태 업데이트
+  const handleRemove = (lookId) => {
+    alert(`아이템 ${lookId}가 삭제되었습니다.`);
   };
 
   return (
@@ -63,87 +63,59 @@ const UserLooks = () => {
       bg="white"
       display="flex"
       flexDirection="column"
-      minHeight="100vh" // 전체 화면 높이를 채우도록 설정
-      paddingBottom="50px" // 하단에 고정된 버튼에 공간을 확보
-      paddingTop="50px" // 상단에 헤더에 가려지지 않도록 패딩 추가
+      paddingY={8}
       fontFamily={'Pretendard'}
+      mt={10}
     >
-      <VStack
-        spacing={4}
-        align="stretch"
-        flex="1" // 남은 공간을 차지하도록 설정
-        overflowY="auto" // 콘텐츠가 화면을 넘어갈 때 스크롤 가능하게 설정
-      >
-        {/* User Profile */}
-        {/* <HStack spacing={4} p={4}>
-          <Avatar
-            size="lg"
-            name="Arouja Riri"
-            src="https://via.placeholder.com/100"
+      <VStack spacing={4} align="stretch">
+        {looks.map((look) => (
+          <Flex
+            key={look.id}
+            bg="white"
+            boxShadow="md"
+            borderRadius="3xl"
+            p={4}
+            alignItems="center"
+            justifyContent="space-between"
+            mb={4}
           >
-            <AvatarBadge boxSize="1.25em" bg="green.500" />
-          </Avatar>
-          <VStack align="start" spacing={0}>
-            <Text fontWeight="bold">이현준</Text>
-            <Text color="gray.500">(7 Looks)</Text>
-          </VStack>
-        </HStack> */}
-
-        {/* Tabs */}
-        <HStack spacing={4} p={4} justify="center">
-          <Button colorScheme="blackAlpha" variant="solid" flexGrow={1}>
-            좋아요 목록
-          </Button>
-        </HStack>
-
-        {/* Looks Grid */}
-        <Grid templateColumns="repeat(2, 1fr)" gap={4} p={4}>
-          {looks.map((look) => (
-            <GridItem key={look.id} w="100%">
-              <VStack
-                align="stretch"
-                spacing={3}
+            <HStack spacing={4} align="center">
+              <Box
+                width="80px"
+                height="80px"
+                bg="gray.100"
                 borderRadius="md"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
                 overflow="hidden"
-                boxShadow="md"
-                p={4}
               >
-                <Image src={look.image} alt={look.title} borderRadius="md" />
-                <Text fontSize="sm" fontWeight="medium" textAlign="center">
+                <Image src={look.image} alt={look.title} boxSize="100%" />
+              </Box>
+              <VStack align="flex-start" spacing={1}>
+                <Text fontSize="lg" fontWeight="bold">
                   {look.title}
                 </Text>
-                <Flex justifyContent="center" alignItems="center">
-                  <HStack justifyContent="center" spacing={1}>
-                    {[...Array(5)].map((_, i) => (
-                      <StarIcon
-                        key={i}
-                        color={i < look.rating ? 'yellow.400' : 'gray.300'}
-                        cursor="pointer"
-                        onClick={() => handleRatingClick(look.id, i + 1)}
-                      />
-                    ))}
-                  </HStack>
-                </Flex>
+                <Text fontSize="md" color="gray.500">
+                  {look.price}
+                </Text>
+                <Text fontSize="sm" color="gray.700">
+                  Size: {look.size}
+                </Text>
               </VStack>
-            </GridItem>
-          ))}
-        </Grid>
+            </HStack>
+            <IconButton
+              icon={<DeleteIcon />}
+              aria-label="Remove from cart"
+              size="lg"
+              borderRadius="full"
+              bg="red.100"
+              _hover={{ bg: 'red.200' }}
+              onClick={() => handleRemove(look.id)}
+            />
+          </Flex>
+        ))}
       </VStack>
-
-      {/* Style Look Button */}
-      <Button
-        position="fixed"
-        bottom="4"
-        left="50%"
-        transform="translateX(-50%)"
-        colorScheme="pink"
-        size="lg"
-        borderRadius="full"
-        px={8}
-        zIndex="1000" // 버튼이 스크롤 위에 표시되도록 설정
-      >
-        STYLE LOOK
-      </Button>
     </Box>
   );
 };

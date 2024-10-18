@@ -1,4 +1,3 @@
-// src/components/CategoryMenu.js
 import React from 'react';
 import { HStack, Box, Image, Text } from '@chakra-ui/react';
 import { Link as RouterLink } from 'react-router-dom';
@@ -34,7 +33,15 @@ const categories = [
 
 const CategoryMenu = () => {
   return (
-    <Box p={4} bg="white" boxShadow="sm" borderRadius="lg" mt={4}>
+    <Box
+      p={4}
+      bg="white"
+      boxShadow="sm"
+      borderRadius="lg"
+      mt={4}
+      maxW={{ base: '350px', md: '600px', lg: '800px' }} // 화면 크기에 따라 조정
+      mx="auto" // 수평 중앙 정렬
+    >
       {/* "Categories" 텍스트 추가 */}
       <Text
         fontFamily={'Pretendard'}
@@ -48,16 +55,16 @@ const CategoryMenu = () => {
 
       {/* 카테고리 HStack */}
       <HStack
-        overflowX="auto" // 가로 스크롤 적용
+        overflowX="auto"
         spacing={4}
         p={4}
         bg="white"
         boxShadow="sm"
-        maxW="container.md"
-        w="100%"
-        mx="auto"
+        maxW={{ base: '350px', md: '600px', lg: '800px' }} // 화면 크기에 따라 조정
+        mx="auto" // 수평 중앙 정렬
         mb={6}
         borderRadius="lg"
+        justifyContent="center" // HStack 내부 아이템을 가운데 정렬
         css={{
           '&::-webkit-scrollbar': {
             height: '8px',
@@ -75,7 +82,7 @@ const CategoryMenu = () => {
           <Box
             key={index}
             as={RouterLink}
-            to={`/category/${category.name.toLowerCase()}`}
+            to={`/Home/${category.name.toLowerCase()}`}
             textAlign="center"
             flexShrink="0"
             minW="120px"

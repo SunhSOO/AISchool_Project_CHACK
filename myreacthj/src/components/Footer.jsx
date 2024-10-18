@@ -1,10 +1,24 @@
+// src/components/Footer.js
 import React from 'react';
-import { Flex, Button, Icon } from '@chakra-ui/react';
-import { FaHome, FaUser, FaShoppingCart } from 'react-icons/fa';
+import { Flex, Button, Box } from '@chakra-ui/react';
+import { Icon } from '@chakra-ui/react';
+import { FaHome, FaHeart, FaUser } from 'react-icons/fa';
 import { IoGridOutline } from 'react-icons/io5';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 
 const Footer = () => {
+  const location = useLocation();
+
+  const getIconStyle = (path) => {
+    return location.pathname === path
+      ? {
+          borderBottom: '2px solid black', // 밑줄 추가
+          width: 'fit-content', // 아이콘 크기에 맞게 너비 설정
+          paddingBottom: '2px', // 아이콘과 밑줄 간격
+        }
+      : {};
+  };
+
   return (
     <Flex
       as="footer"
@@ -18,9 +32,10 @@ const Footer = () => {
       right="0"
       boxShadow="inner"
       zIndex="1000"
-      maxW="600px" // 최대 너비를 600px로 제한
-      width="100%" // 화면이 600px보다 작을 때는 100% 너비로
-      m="0 auto" // 수평 중앙 정렬
+      maxW="600px"
+      width="100%"
+      m="0 auto"
+      borderTopRadius="20px" // 위쪽 모서리를 둥글게 만듭니다
     >
       <Button
         variant="ghost"
@@ -28,17 +43,25 @@ const Footer = () => {
         fontSize="xs"
         as={RouterLink}
         to="/home"
+        _hover={{ bg: 'transparent', transform: 'scale(1.1)' }} // 호버 시 배경색 제거, 크기만 커짐
+        transition="transform 0.2s" // 크기 변화 시 애니메이션 부드럽게
       >
-        <Icon as={FaHome} boxSize={5} />
+        <Box {...getIconStyle('/home')}>
+          <Icon as={FaHome} boxSize={5} />
+        </Box>
       </Button>
       <Button
         variant="ghost"
         flexDirection="column"
         fontSize="xs"
         as={RouterLink}
-        to="/looksgallery"
+        to="/ShoppingPage"
+        _hover={{ bg: 'transparent', transform: 'scale(1.1)' }} // 호버 시 배경색 제거, 크기만 커짐
+        transition="transform 0.2s" // 크기 변화 시 애니메이션 부드럽게
       >
-        <Icon as={IoGridOutline} boxSize={5} />
+        <Box {...getIconStyle('/ShoppingPage')}>
+          <Icon as={IoGridOutline} boxSize={5} />
+        </Box>
       </Button>
       <Button
         variant="ghost"
@@ -46,8 +69,12 @@ const Footer = () => {
         fontSize="xs"
         as={RouterLink}
         to="/UserLooks"
+        _hover={{ bg: 'transparent', transform: 'scale(1.1)' }} // 호버 시 배경색 제거, 크기만 커짐
+        transition="transform 0.2s" // 크기 변화 시 애니메이션 부드럽게
       >
-        <Icon as={FaShoppingCart} boxSize={5} />
+        <Box {...getIconStyle('/UserLooks')}>
+          <Icon as={FaHeart} boxSize={5} />
+        </Box>
       </Button>
       <Button
         variant="ghost"
@@ -55,8 +82,12 @@ const Footer = () => {
         fontSize="xs"
         as={RouterLink}
         to="/mypage"
+        _hover={{ bg: 'transparent', transform: 'scale(1.1)' }} // 호버 시 배경색 제거, 크기만 커짐
+        transition="transform 0.2s" // 크기 변화 시 애니메이션 부드럽게
       >
-        <Icon as={FaUser} boxSize={5} />
+        <Box {...getIconStyle('/mypage')}>
+          <Icon as={FaUser} boxSize={5} />
+        </Box>
       </Button>
     </Flex>
   );

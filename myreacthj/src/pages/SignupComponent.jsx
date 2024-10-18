@@ -52,7 +52,7 @@ const SignupComponent = () => {
         variant="ghost"
         position="absolute"
         top={4}
-        left={4}
+        left={2}
         onClick={handleBack}
       />
       <Flex direction="column" minHeight="100vh" justify="center">
@@ -60,11 +60,11 @@ const SignupComponent = () => {
           <VStack spacing={6} align="stretch">
             <Heading
               as="h1"
-              size="xl"
-              textAlign="center"
+              size="2xl"
+              textAlign="left"
               fontFamily={'Pretendard'}
             >
-              Chack 서비스 가입
+              Chack<br></br> 서비스 가입
             </Heading>
             <form onSubmit={handleSubmit}>
               <VStack spacing={4}>
@@ -97,7 +97,7 @@ const SignupComponent = () => {
                 </FormControl>
                 <Button
                   type="submit"
-                  colorScheme="blue"
+                  colorScheme="red"
                   width="full"
                   isLoading={isLoading}
                 >
