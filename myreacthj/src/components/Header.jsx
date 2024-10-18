@@ -53,7 +53,7 @@ const Header = () => {
   return (
     <>
       <Flex
-        height={['60px', '70px', '80px']}
+        height={70}
         maxW="600px"
         width="100%"
         as="header"
@@ -84,6 +84,10 @@ const Header = () => {
           position="absolute"
           left="50%"
           transform="translateX(-50%)"
+          overflow="hidden" // 로고 하단 클릭 방지
+          display="flex" // Link 요소 크기에 맞게 적용
+          justifyContent="center"
+          alignItems="center"
         >
           <Image
             src={logoImage}

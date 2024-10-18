@@ -7,9 +7,12 @@ import {
   Icon,
   useDisclosure,
   IconButton,
+  Input,
+  VStack,
+  Text,
 } from '@chakra-ui/react';
-import { FiCamera } from 'react-icons/fi'; // 카메라 아이콘 불러오기
-import { ArrowBackIcon } from '@chakra-ui/icons'; // 뒤로 가기 아이콘 불러오기
+import { FiCamera } from 'react-icons/fi';
+import { ArrowBackIcon } from '@chakra-ui/icons';
 import lobotImage from '../assets/lobot.jpg';
 import {
   Accordion,
@@ -18,12 +21,15 @@ import {
   AccordionPanel,
   AccordionIcon,
 } from '@chakra-ui/react';
-import CaptureGuide from './CaptureGuide'; // 새로 만든 컴포넌트를 가져옵니다
+import CaptureGuide from '../components/CaptureGuide';
 
-const MainImage = () => {
+const Avater = () => {
   const [isAvatarVisible, setIsAvatarVisible] = useState(true);
   const [capturedImage, setCapturedImage] = useState(null);
-  const { isOpen, onOpen, onClose } = useDisclosure(); // 모달 열기/닫기 상태 관리
+  const [gender, setGender] = useState(''); // 남자/여자 선택 상태
+  const [height, setHeight] = useState(''); // 키 입력 상태
+  const [weight, setWeight] = useState(''); // 몸무게 입력 상태
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleToggle = () => {
     setIsAvatarVisible(!isAvatarVisible);
@@ -37,13 +43,25 @@ const MainImage = () => {
     }
   };
 
+  const handleGenderSelection = (selectedGender) => {
+    setGender(selectedGender);
+  };
+
   return (
-    <Flex p={4} direction="column" align="center" width="100%">
+    <Flex
+      p={4}
+      direction="column"
+      align="center"
+      width="100%"
+      mt={12}
+      height="150vh"
+    >
       <Accordion
         defaultIndex={[0]}
         allowToggle
         width="100%"
         maxWidth={['350px', '600px']}
+        mb={4}
       >
         <AccordionItem border="none">
           {({ isExpanded }) => (
@@ -58,6 +76,7 @@ const MainImage = () => {
                   mb={4}
                   width="100%"
                   justifyContent="center"
+                  zIndex="1"
                 >
                   <Box
                     as="span"
@@ -67,7 +86,7 @@ const MainImage = () => {
                   >
                     {isExpanded ? '아바타 숨기기' : '아바타 보기'}
                   </Box>
-                  <AccordionIcon ml={2} /> {/* 아이콘과 텍스트 간격 설정 */}
+                  <AccordionIcon ml={2} />
                 </AccordionButton>
               </h2>
               <AccordionPanel
@@ -87,23 +106,20 @@ const MainImage = () => {
                   display="flex"
                   justifyContent="center"
                 >
-                  {/* 이미지 위에 촬영 가이드 버튼 */}
                   <Button
                     position="absolute"
                     top="10px"
                     left="10px"
-                    colorScheme="gray"
+                    colorScheme="green"
                     size="sm"
-                    onClick={onOpen} // 클릭 시 모달 열기
-                    zIndex="1"
-                    bg="white"
+                    onClick={onOpen}
+                    zIndex="2"
                     boxShadow="md"
-                    _hover={{ bg: 'gray.100' }}
+                    _hover={{ bg: 'green.100' }}
                   >
                     촬영 가이드
                   </Button>
 
-                  {/* 이미지 위에 뒤로 가기 버튼 */}
                   <IconButton
                     icon={<ArrowBackIcon />}
                     position="absolute"
@@ -111,7 +127,7 @@ const MainImage = () => {
                     right="10px"
                     size="lg"
                     variant="ghost"
-                    zIndex="1"
+                    zIndex="2"
                     aria-label="뒤로 가기"
                   />
 
@@ -123,7 +139,6 @@ const MainImage = () => {
                     height="100%"
                   />
 
-                  {/* 이미지 내부 하단 가운데에 카메라 버튼 */}
                   <Button
                     bg="white"
                     borderRadius="full"
@@ -134,6 +149,7 @@ const MainImage = () => {
                     bottom="10px"
                     left="50%"
                     transform="translateX(-50%)"
+                    zIndex="2"
                   >
                     <Icon as={FiCamera} w={5} h={5} color="black" />
                     <input
@@ -157,10 +173,78 @@ const MainImage = () => {
         </AccordionItem>
       </Accordion>
 
-      {/* 촬영 가이드 모달 */}
+      {/* 성별 선택 및 키, 몸무게 입력 필드 */}
+      <VStack
+        spacing={4}
+        width="100%"
+        maxWidth={['350px', '600px']}
+        p={4}
+        boxShadow="md"
+        borderRadius="lg"
+        bg="white"
+      >
+        <Flex justifyContent="space-between" width="100%">
+          <Button
+            flex="1"
+            variant={gender === 'male' ? 'solid' : 'outline'}
+            colorScheme={gender === 'male' ? 'blue' : 'gray'}
+            onClick={() => handleGenderSelection('male')}
+            mr={2}
+          >
+            MALE
+          </Button>
+          <Button
+            flex="1"
+            variant={gender === 'female' ? 'solid' : 'outline'}
+            colorScheme={gender === 'female' ? 'pink' : 'gray'}
+            onClick={() => handleGenderSelection('female')}
+            ml={2}
+          >
+            FEMALE
+          </Button>
+        </Flex>
+
+        <Box width="100%">
+          <Text fontWeight="bold" mb={1}>
+            Height
+          </Text>
+          <Input
+            placeholder="Enter your height (cm)"
+            value={height}
+            onChange={(e) => setHeight(e.target.value)}
+            bg="gray.100"
+            borderRadius="md"
+            mb={2}
+          />
+          <Text fontWeight="bold" mb={1}>
+            Weight
+          </Text>
+          <Input
+            placeholder="Enter your weight (kg)"
+            value={weight}
+            onChange={(e) => setWeight(e.target.value)}
+            bg="gray.100"
+            borderRadius="md"
+          />
+        </Box>
+
+        <Button
+          colorScheme="teal"
+          size="md"
+          onClick={() => {
+            console.log('Selected gender:', gender);
+            console.log('Height:', height);
+            console.log('Weight:', weight);
+            // 나중에 서버와 연결할 때 이 부분에서 데이터 전송
+          }}
+        >
+          Submit
+        </Button>
+      </VStack>
+
       <CaptureGuide isOpen={isOpen} onClose={onClose} />
     </Flex>
   );
 };
 
-export default MainImage;
+export default Avater;

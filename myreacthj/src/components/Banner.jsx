@@ -10,7 +10,7 @@ const StartComponent = () => {
       boxShadow="md"
       borderRadius="lg"
       p={6}
-      maxW="600px"
+      maxW={{ base: '350px', md: '600px' }} // 작은 화면에서는 350px, 큰 화면에서는 600px
       display="flex"
       alignItems="center"
       mt={4}
@@ -39,7 +39,7 @@ const StartComponent = () => {
           <Button
             fontFamily={'Pretendard'}
             as={RouterLink}
-            to="/ShoppingPage"
+            to="/avatar"
             colorScheme="blackAlpha"
             variant="outline"
             size="sm"
