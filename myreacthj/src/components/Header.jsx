@@ -136,7 +136,7 @@ const Header = () => {
                 leftIcon={<RepeatClockIcon />}
                 w="100%"
                 onClick={() => {
-                  navigate('/ShoppingCart');
+                  navigate('/userlooks');
                   onClose();
                 }}
               >

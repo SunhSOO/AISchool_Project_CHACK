@@ -88,7 +88,7 @@ const LoginPage = () => {
 
         <Text fontSize={['xs', 'sm']} fontWeight="light">
           아니요,{' '}
-          <Link href="#" textDecoration="underline">
+          <Link href="/home" textDecoration="underline">
             둘러볼래요!
           </Link>
         </Text>

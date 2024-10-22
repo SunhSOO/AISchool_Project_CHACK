@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Image,
-  Box,
-  Flex,
-  Button,
-  Icon,
-  useDisclosure,
-  IconButton,
-} from '@chakra-ui/react';
+import { Image, Box, Flex, Button, Icon, IconButton } from '@chakra-ui/react';
 import { FiCamera } from 'react-icons/fi'; // 카메라 아이콘 불러오기
 import { ArrowBackIcon } from '@chakra-ui/icons'; // 뒤로 가기 아이콘 불러오기
 import lobotImage from '../assets/lobot.jpg';
@@ -18,12 +10,10 @@ import {
   AccordionPanel,
   AccordionIcon,
 } from '@chakra-ui/react';
-import CaptureGuide from './CaptureGuide'; // 새로 만든 컴포넌트를 가져옵니다
 
 const MainImage = () => {
   const [isAvatarVisible, setIsAvatarVisible] = useState(true);
   const [capturedImage, setCapturedImage] = useState(null);
-  const { isOpen, onOpen, onClose } = useDisclosure(); // 모달 열기/닫기 상태 관리
 
   const handleToggle = () => {
     setIsAvatarVisible(!isAvatarVisible);
@@ -87,22 +77,6 @@ const MainImage = () => {
                   display="flex"
                   justifyContent="center"
                 >
-                  {/* 이미지 위에 촬영 가이드 버튼 */}
-                  <Button
-                    position="absolute"
-                    top="10px"
-                    left="10px"
-                    colorScheme="gray"
-                    size="sm"
-                    onClick={onOpen} // 클릭 시 모달 열기
-                    zIndex="1"
-                    bg="white"
-                    boxShadow="md"
-                    _hover={{ bg: 'gray.100' }}
-                  >
-                    촬영 가이드
-                  </Button>
-
                   {/* 이미지 위에 뒤로 가기 버튼 */}
                   <IconButton
                     icon={<ArrowBackIcon />}
@@ -129,13 +103,17 @@ const MainImage = () => {
                     borderRadius="full"
                     boxShadow="md"
                     _hover={{ bg: 'gray.100' }}
-                    size="md"
+                    size="lg" // 버튼 크기 증가
                     position="absolute"
                     bottom="10px"
                     left="50%"
                     transform="translateX(-50%)"
+                    zIndex="2"
+                    width="200px" // 버튼의 폭을 키움
+                    height="60px" // 버튼의 높이를 키움
                   >
-                    <Icon as={FiCamera} w={5} h={5} color="black" />
+                    <Icon as={FiCamera} w={8} h={8} color="black" />{' '}
+                    {/* 아이콘 크기를 증가 */}
                     <input
                       type="file"
                       accept="image/*"
@@ -156,9 +134,6 @@ const MainImage = () => {
           )}
         </AccordionItem>
       </Accordion>
-
-      {/* 촬영 가이드 모달 */}
-      <CaptureGuide isOpen={isOpen} onClose={onClose} />
     </Flex>
   );
 };

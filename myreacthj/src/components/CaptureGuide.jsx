@@ -1,4 +1,3 @@
-// src/components/CaptureGuide.js
 import React from 'react';
 import {
   Modal,
@@ -13,13 +12,13 @@ import {
   Button,
 } from '@chakra-ui/react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination } from 'swiper';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
 import guideImage1 from '../assets/guide1.png'; // 올바른 자세 이미지
 import guideImage2 from '../assets/guide2.png'; // 바른 자세가 아닌 경우 이미지
 import guideImage3 from '../assets/guide3.png'; // 수직 수평 맞추기 이미지
+
 const CaptureGuide = ({ isOpen, onClose }) => {
   return (
     <Modal
@@ -38,69 +37,98 @@ const CaptureGuide = ({ isOpen, onClose }) => {
             slidesPerView={1}
             pagination={{ clickable: true }}
           >
+            {/* 첫 번째 슬라이드 */}
             <SwiperSlide>
-              <Box>
+              <Box
+                display="flex"
+                flexDirection="column"
+                justifyContent="center"
+                alignItems="center"
+                width="100%"
+                minHeight="600px"
+                mb={4}
+              >
                 <Image
                   src={guideImage1}
                   alt="올바른 자세"
                   borderRadius="md"
-                  width="100%"
-                  maxHeight="600px"
+                  width="80%" // 모든 이미지에 일관된 너비 적용
+                  maxWidth="300px"
+                  maxHeight="400px"
                   objectFit="cover"
                   mb={4}
                 />
-                <Text>
-                  정면을 바라보고 올바른 자세로 촬영해주세요.<br></br> 자세가
-                  바르지 않으면 측정에 영향을 줄 수 있습니다.
+                <Text textAlign="center" mb={2}>
+                  정면을 바라보고 올바른 자세로 촬영해주세요. 자세가 바르지
+                  않으면 측정에 영향을 줄 수 있습니다.
                 </Text>
                 <Button
-                  bg="blue.500"
+                  bg="red.500"
                   color="white"
-                  _hover={{ bg: 'blue.600' }}
+                  _hover={{ bg: 'red.600' }}
                   display="flex"
                   justifyContent="center"
                   alignItems="center"
                   mt={2}
-                  onClick={() => alert('다음 이미지로 이동')}
                 >
                   옆으로 밀어주세요 →
                 </Button>
               </Box>
             </SwiperSlide>
+
+            {/* 두 번째 슬라이드 */}
             <SwiperSlide>
               <Box
-                minHeight={600}
-                justifyContent="center"
+                display="flex"
+                flexDirection="column"
                 alignItems="center"
                 width="100%"
+                minHeight="600px"
                 mb={4}
+                mt={110}
+                justifyContent="flex-start" // 이미지를 상단에 배치
               >
                 <Image
                   src={guideImage2}
                   alt="바른 자세가 아닌 경우"
                   borderRadius="md"
-                  width="150px"
-                  maxHeight="600px"
-                  mb={4}
+                  width="70%"
+                  maxWidth="150px"
+                  maxHeight="300px"
+                  objectFit="cover"
+                  mb={4} // 이미지와 텍스트 사이에 약간의 마진 추가
                 />
-                <Text>
+                <Text textAlign="center" mt={4}>
+                  {' '}
+                  {/* 텍스트 상단에 여백 추가 */}
                   자세가 바르지 않으면 정확한 측정이 어려울 수 있습니다.
                   가능하면 자세를 바르게 유지해주세요.
                 </Text>
               </Box>
             </SwiperSlide>
+
+            {/* 세 번째 슬라이드 */}
             <SwiperSlide>
-              <Box>
+              <Box
+                display="flex"
+                flexDirection="column"
+                justifyContent="center"
+                alignItems="center"
+                width="100%"
+                minHeight="600px"
+                mb={4}
+              >
                 <Image
                   src={guideImage3}
                   alt="수직 수평 맞추기"
                   borderRadius="md"
-                  width="100%"
-                  maxHeight="500px"
+                  width="80%"
+                  maxWidth="300px"
+                  maxHeight="400px"
                   objectFit="cover"
                   mb={4}
                 />
-                <Text>
+                <Text textAlign="center">
                   수직 수평이 맞지 않으면 사진이 왜곡될 수 있습니다. 촬영 시
                   카메라를 수평으로 맞춰주세요.
                 </Text>

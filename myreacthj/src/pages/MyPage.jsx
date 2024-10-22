@@ -1,4 +1,3 @@
-// src/pages/MyPage.js
 import React from 'react';
 import {
   Box,
@@ -14,10 +13,17 @@ import {
 import { FaUserEdit, FaUserCircle } from 'react-icons/fa';
 import { FiLogOut } from 'react-icons/fi';
 import { MdAccountCircle, MdSecurity } from 'react-icons/md';
-import { BsFillExclamationCircleFill } from 'react-icons/bs';
 import Userimage from '../assets/Userimage.png';
+import { useNavigate } from 'react-router-dom';
 
 const MyPage = () => {
+  const navigate = useNavigate(); // 페이지 이동을 위한 useNavigate 사용
+
+  const handleLogout = () => {
+    // 로그아웃 시 처리할 작업 (세션 삭제 등)
+    navigate('/'); // LoginPage로 이동
+  };
+
   return (
     <Box
       maxWidth="600px"
@@ -80,7 +86,6 @@ const MyPage = () => {
               </Text>
             </Box>
           </HStack>
-          <Icon as={BsFillExclamationCircleFill} boxSize={4} color="red.500" />
         </Box>
 
         <Box
@@ -144,6 +149,7 @@ const MyPage = () => {
           </HStack>
         </Box>
 
+        {/* 로그아웃 섹션 */}
         <Box
           p={4}
           bg="white"
@@ -152,6 +158,8 @@ const MyPage = () => {
           display="flex"
           alignItems="center"
           justifyContent="space-between"
+          onClick={handleLogout} // 클릭 시 로그아웃 함수 호출
+          cursor="pointer"
         >
           <HStack>
             <Icon as={FiLogOut} boxSize={6} color="gray.600" />

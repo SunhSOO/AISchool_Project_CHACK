@@ -6,13 +6,11 @@ import {
   Button,
   Icon,
   useDisclosure,
-  IconButton,
   Input,
   VStack,
   Text,
 } from '@chakra-ui/react';
 import { FiCamera } from 'react-icons/fi';
-import { ArrowBackIcon } from '@chakra-ui/icons';
 import lobotImage from '../assets/lobot.jpg';
 import {
   Accordion,
@@ -22,8 +20,10 @@ import {
   AccordionIcon,
 } from '@chakra-ui/react';
 import CaptureGuide from '../components/CaptureGuide';
+import { useNavigate } from 'react-router-dom'; // 페이지 이동을 위한 useNavigate 가져오기
 
 const Avater = () => {
+  const navigate = useNavigate(); // navigate 함수 호출
   const [isAvatarVisible, setIsAvatarVisible] = useState(true);
   const [capturedImage, setCapturedImage] = useState(null);
   const [gender, setGender] = useState(''); // 남자/여자 선택 상태
@@ -108,28 +108,31 @@ const Avater = () => {
                 >
                   <Button
                     position="absolute"
-                    top="10px"
-                    left="10px"
-                    colorScheme="green"
+                    borderRadius="full"
+                    top="20px" // 상단 위치 조정
+                    left="20px" // 좌측 여백 조정
                     size="sm"
                     onClick={onOpen}
                     zIndex="2"
-                    boxShadow="md"
-                    _hover={{ bg: 'green.100' }}
+                    variant="outline" // 스포크만 주는 설정
+                    _hover={{ bg: 'gray.100' }} // 호버 시 약간의 배경색 추가
                   >
                     촬영 가이드
                   </Button>
 
-                  <IconButton
-                    icon={<ArrowBackIcon />}
+                  <Button
                     position="absolute"
-                    top="10px"
-                    right="10px"
-                    size="lg"
-                    variant="ghost"
+                    borderRadius="full"
+                    top="20px" // 상단 위치 조정
+                    right="20px" // 우측 여백 조정
+                    size="sm"
+                    variant="outline" // 테두리만 있는 버튼
+                    colorScheme="gray" // 테두리 색상
                     zIndex="2"
-                    aria-label="뒤로 가기"
-                  />
+                    _hover={{ bg: 'gray.100' }} // 호버 시 배경색 설정
+                  >
+                    재촬영
+                  </Button>
 
                   <Image
                     src={capturedImage || lobotImage}
@@ -144,14 +147,17 @@ const Avater = () => {
                     borderRadius="full"
                     boxShadow="md"
                     _hover={{ bg: 'gray.100' }}
-                    size="md"
+                    size="lg" // 버튼 크기 증가
                     position="absolute"
                     bottom="10px"
                     left="50%"
                     transform="translateX(-50%)"
                     zIndex="2"
+                    width="200px" // 버튼의 폭을 키움
+                    height="60px" // 버튼의 높이를 키움
                   >
-                    <Icon as={FiCamera} w={5} h={5} color="black" />
+                    <Icon as={FiCamera} w={8} h={8} color="black" />{' '}
+                    {/* 아이콘 크기를 증가 */}
                     <input
                       type="file"
                       accept="image/*"
@@ -235,6 +241,7 @@ const Avater = () => {
             console.log('Selected gender:', gender);
             console.log('Height:', height);
             console.log('Weight:', weight);
+            navigate('/measurement-form');
             // 나중에 서버와 연결할 때 이 부분에서 데이터 전송
           }}
         >
