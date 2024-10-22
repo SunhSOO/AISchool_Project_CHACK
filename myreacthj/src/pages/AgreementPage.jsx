@@ -65,16 +65,16 @@ const AgreementPage = () => {
         variant="ghost"
         position="absolute"
         top={4}
-        left={4}
+        left={2}
         onClick={handleBack}
       />
       <Flex direction="column" minHeight="100vh" justify="center">
         <Container maxW="400px">
           <VStack spacing={6} align="stretch">
-            <Text fontSize="2xl" fontWeight="bold">
+            <Text fontSize="4xl" fontWeight="bold">
               반갑습니다,
             </Text>
-            <Text mb={10}>
+            <Text mb={5}>
               착 서비스 이용을 위한 <br /> 약관 동의가 필요합니다.
             </Text>
 
