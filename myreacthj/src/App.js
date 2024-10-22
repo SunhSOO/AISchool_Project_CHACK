@@ -15,10 +15,13 @@ import NotFound from './pages/NotFound';
 import LoginPage from './pages/LoginPage';
 import AgreementPage from './pages/AgreementPage';
 import ShoppingPage from './pages/ShoppingPage';
-import UserLooks from './pages/UserLooks'; // UserLooks 페이지 추가
-import SignupComponent from './pages/SignupComponent'; // 회원가입 컴포넌트 가져오기
+import UserLooks from './pages/UserLooks';
+import SignupComponent from './pages/SignupComponent';
 import MyPage from './pages/MyPage';
 import LooksGallery from './pages/LooksGallery';
+import Avatar from './pages/Avater'; // Avatar 페이지 컴포넌트 가져오기
+import MeasurementForm from './components/MeasurementForm'; // MeasurementForm 컴포넌트
+
 const AppLayout = ({ children }) => {
   const location = useLocation();
 
@@ -73,9 +76,13 @@ const App = () => {
             {/* 404 페이지 경로 */}
             <Route path="*" element={<NotFound />} />
             {/* 갤러리 경로 */}
-            <Route path="/looksgallery" element={<LooksGallery />} />{' '}
-            {/* LooksGallery 경로 추가 */}
+            <Route path="/looksgallery" element={<LooksGallery />} />
+            {/* MyPage 경로 */}
             <Route path="/mypage" element={<MyPage />} />
+            {/* Avatar 페이지 경로 */}
+            <Route path="/avatar" element={<Avatar />} />
+            {/* 신체사이즈 수정 경로 */}
+            <Route path="/measurement-form" element={<MeasurementForm />} />
           </Routes>
         </AppLayout>
       </Router>

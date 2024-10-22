@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Image, Box, Flex, Button, Icon, HStack } from '@chakra-ui/react';
+import { Image, Box, Flex, Button, Icon, IconButton } from '@chakra-ui/react';
 import { FiCamera } from 'react-icons/fi'; // 카메라 아이콘 불러오기
+import { ArrowBackIcon } from '@chakra-ui/icons'; // 뒤로 가기 아이콘 불러오기
 import lobotImage from '../assets/lobot.jpg';
 import {
   Accordion,
@@ -28,7 +29,12 @@ const MainImage = () => {
 
   return (
     <Flex p={4} direction="column" align="center" width="100%">
-      <Accordion defaultIndex={[0]} allowToggle width="100%" maxWidth="600px">
+      <Accordion
+        defaultIndex={[0]}
+        allowToggle
+        width="100%"
+        maxWidth={['350px', '600px']}
+      >
         <AccordionItem border="none">
           {({ isExpanded }) => (
             <>
@@ -40,6 +46,8 @@ const MainImage = () => {
                   boxShadow="md"
                   _hover={{ bg: 'gray.100' }}
                   mb={4}
+                  width="100%"
+                  justifyContent="center"
                 >
                   <Box
                     as="span"
@@ -64,26 +72,22 @@ const MainImage = () => {
                   overflow="hidden"
                   boxShadow="md"
                   width="100%"
-                  maxWidth="300px"
+                  maxWidth={['350px', '600px']}
                   height="auto"
                   display="flex"
                   justifyContent="center"
                 >
-                  {/* 이미지 위 버튼들 */}
-                  <HStack
+                  {/* 이미지 위에 뒤로 가기 버튼 */}
+                  <IconButton
+                    icon={<ArrowBackIcon />}
                     position="absolute"
                     top="10px"
                     right="10px"
-                    spacing={2}
+                    size="lg"
+                    variant="ghost"
                     zIndex="1"
-                  >
-                    <Button size="sm" colorScheme="red" variant="solid">
-                      선택
-                    </Button>
-                    <Button size="sm" colorScheme="gray" variant="outline">
-                      수정
-                    </Button>
-                  </HStack>
+                    aria-label="뒤로 가기"
+                  />
 
                   <Image
                     src={capturedImage || lobotImage}
@@ -92,38 +96,44 @@ const MainImage = () => {
                     width="100%"
                     height="100%"
                   />
+
+                  {/* 이미지 내부 하단 가운데에 카메라 버튼 */}
+                  <Button
+                    bg="white"
+                    borderRadius="full"
+                    boxShadow="md"
+                    _hover={{ bg: 'gray.100' }}
+                    size="lg" // 버튼 크기 증가
+                    position="absolute"
+                    bottom="10px"
+                    left="50%"
+                    transform="translateX(-50%)"
+                    zIndex="2"
+                    width="200px" // 버튼의 폭을 키움
+                    height="60px" // 버튼의 높이를 키움
+                  >
+                    <Icon as={FiCamera} w={8} h={8} color="black" />{' '}
+                    {/* 아이콘 크기를 증가 */}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      onChange={handleCapture}
+                      style={{
+                        position: 'absolute',
+                        opacity: 0,
+                        width: '100%',
+                        height: '100%',
+                        cursor: 'pointer',
+                      }}
+                    />
+                  </Button>
                 </Box>
               </AccordionPanel>
             </>
           )}
         </AccordionItem>
       </Accordion>
-
-      {/* 하단 카메라 버튼 */}
-      <Button
-        mt={4}
-        bg="white"
-        borderRadius="full"
-        boxShadow="md"
-        _hover={{ bg: 'gray.100' }}
-        size="md"
-        position="relative"
-      >
-        <Icon as={FiCamera} w={5} h={5} color="black" />
-        <input
-          type="file"
-          accept="image/*"
-          capture="environment"
-          onChange={handleCapture}
-          style={{
-            position: 'absolute',
-            opacity: 0,
-            width: '100%',
-            height: '100%',
-            cursor: 'pointer',
-          }}
-        />
-      </Button>
     </Flex>
   );
 };
