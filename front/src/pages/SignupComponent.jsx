@@ -19,12 +19,12 @@ import { ArrowBackIcon } from '@chakra-ui/icons';
 import axios from 'axios'; // Axios 사용하여 HTTP 요청
 
 const SignupComponent = () => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const toast = useToast();
-  const navigate = useNavigate();
+  const [username, setUsername] = useState(''); // 사용자 이름 상태 관리
+  const [email, setEmail] = useState(''); // 이메일 상태 관리
+  const [password, setPassword] = useState(''); // 비밀번호 상태 관리
+  const [isLoading, setIsLoading] = useState(false); // 로딩 상태 관리
+  const toast = useToast(); // 알림 메시지 표시를 위한 Chakra UI 훅
+  const navigate = useNavigate(); // 페이지 이동을 위한 훅
 
   // 회원가입 처리 함수
   const handleSubmit = async (e) => {
@@ -32,10 +32,12 @@ const SignupComponent = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8000/register/', {
-        username,
-        email,
-        password,
+      // FastAPI 백엔드로 회원가입 요청 보내기
+      const response = await axios.post('http://localhost:8000/users/sign-up', {
+        user_id: username,
+        user_name: username, // FastAPI에서 기대하는 필드 이름과 일치
+        user_email: email,
+        password: password,
       });
 
       // 서버 응답이 정상적일 때 처리
@@ -66,11 +68,6 @@ const SignupComponent = () => {
     }
   };
 
-  // 뒤로가기 버튼 핸들러
-  const handleBack = () => {
-    navigate(-1); // 이전 페이지로 돌아가기
-  };
-
   return (
     <Box position="relative" minHeight="100vh" fontFamily={'Pretendard'}>
       {/* 뒤로가기 버튼 */}
@@ -81,7 +78,7 @@ const SignupComponent = () => {
         position="absolute"
         top={4}
         left={2}
-        onClick={handleBack}
+        onClick={() => navigate(-1)}
       />
       <Flex direction="column" minHeight="100vh" justify="center">
         <Container maxW="400px">
@@ -134,7 +131,7 @@ const SignupComponent = () => {
             </form>
             <Text textAlign="center">
               이미 계정이 있으신가요?{' '}
-              <Link color="blue.500" href="#">
+              <Link color="blue.500" href="/login">
                 로그인
               </Link>
             </Text>

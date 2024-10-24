@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 
 # 데이터베이스 URL 설정 (MySQL)
 # 형식: "mysql+pymysql://<username>:<password>@<host>:<port>/<database_name>"
-DATABASE_URL = "mysql+pymysql://root:1234@127.0.0.1:3306/chack"  # 필요에 따라 수정
+DATABASE_URL = "mysql+pymysql://Insa5_IOT_final_3:aischool3@project-db-stu3.smhrd.com:3307/Insa5_IOT_final_3"  # 필요에 따라 수정
 
 # SQLAlchemy 엔진 생성
 # 데이터베이스와 상호작용할 수 있는 엔진을 생성합니다.

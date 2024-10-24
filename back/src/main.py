@@ -9,6 +9,17 @@ logger = logging.getLogger(__name__)
 
 # FastAPI 애플리케이션 인스턴스 생성
 app = FastAPI()
+
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # React 애플리케이션이 실행되는 주소
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # 옷(clothes) 관련 API 라우터 등록
 app.include_router(clothes.router)
 # 사용자(user) 관련 API 라우터 등록
