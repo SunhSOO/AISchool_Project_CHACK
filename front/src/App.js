@@ -21,6 +21,7 @@ import MyPage from './pages/MyPage';
 import LooksGallery from './pages/LooksGallery';
 import Avatar from './pages/Avater'; // Avatar 페이지 컴포넌트 가져오기
 import MeasurementForm from './components/MeasurementForm'; // MeasurementForm 컴포넌트
+import Login from './pages/Login';
 
 const AppLayout = ({ children }) => {
   const location = useLocation();
@@ -29,7 +30,8 @@ const AppLayout = ({ children }) => {
   const isExcludedPage =
     location.pathname === '/' ||
     location.pathname === '/agreement' ||
-    location.pathname === '/signup';
+    location.pathname === '/signup' ||
+    location.pathname === '/login'; // 로그인 페이지도 제외
 
   return (
     <>
@@ -63,6 +65,8 @@ const App = () => {
             <Route path="/" element={<LoginPage />} />
             {/* 동의 페이지 */}
             <Route path="/agreement" element={<AgreementPage />} />
+            {/* 로그인 페이지 */}
+            <Route path="/Login" element={<Login />} />
             {/* 홈 페이지 */}
             <Route path="/home" element={<Home />} />
             {/* 쇼핑 페이지 경로 */}
