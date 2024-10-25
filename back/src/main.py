@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 # FastAPI 애플리케이션 인스턴스 생성
 app = FastAPI()
 
+
 from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
