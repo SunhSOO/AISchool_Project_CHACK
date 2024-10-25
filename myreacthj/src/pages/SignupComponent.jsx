@@ -66,7 +66,7 @@ const SignupComponent = () => {
           duration: 3000,
           isClosable: true,
         });
-        navigate('/home'); // 성공 시 홈 페이지로 이동
+        navigate('/login'); // 성공 시 홈 페이지로 이동
       }
     } catch (error) {
       console.error('회원가입 오류:', error);
@@ -99,7 +99,7 @@ const SignupComponent = () => {
         <Container maxW="400px">
           <VStack spacing={6} align="stretch">
             <Heading as="h1" size="2xl" textAlign="left">
-              Chack 서비스 가입
+              Chack<br></br> 서비스 가입
             </Heading>
             <form onSubmit={handleSubmit}>
               <VStack spacing={4}>

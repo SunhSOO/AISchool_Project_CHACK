@@ -7,12 +7,11 @@ import {
   Heading,
   Button,
   HStack,
-  Switch,
   Icon,
 } from '@chakra-ui/react';
-import { FaUserEdit, FaUserCircle } from 'react-icons/fa';
+import { FaUserEdit } from 'react-icons/fa';
 import { FiLogOut } from 'react-icons/fi';
-import { MdAccountCircle, MdSecurity } from 'react-icons/md';
+import { MdAccountCircle } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 
 const MyPage = () => {

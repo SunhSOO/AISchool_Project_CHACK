@@ -35,7 +35,6 @@ const Footer = () => {
       maxW="600px"
       width="100%"
       m="0 auto"
-      borderTopRadius="20px" // 위쪽 모서리를 둥글게 만듭니다
     >
       <Button
         variant="ghost"
