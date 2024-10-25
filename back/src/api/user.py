@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+# api/user.py
+
+=======
+>>>>>>> develop
 from fastapi import APIRouter, Depends, HTTPException
 
 from database.repository import UserRepository
@@ -5,14 +10,42 @@ from schema.request import SignUpRequest, LogInRequest
 from schema.response import UserSchema
 from service.user import UserService
 
+<<<<<<< HEAD
+=======
 # FastAPI의 APIRouter 객체 생성
 # prefix: "/users"로 설정하면 모든 경로가 "/users"로 시작됨
 # tags: OpenAPI 문서에서 'Users' 태그 아래에 이 API들이 표시됨
+>>>>>>> develop
 router = APIRouter(
     prefix="/users",
     tags=["Users"],
 )
 
+<<<<<<< HEAD
+@router.post("/sign-up", response_model=UserSchema)
+def sign_up(request: SignUpRequest, repository: UserRepository = Depends(), service: UserService = Depends()):
+    existing_user = repository.get_user_by_user_id(request.user_id)
+    if existing_user:
+        raise HTTPException(status_code=400, detail="이미 존재하는 사용자 ID입니다.")
+    existing_email = repository.get_user_by_user_email(request.user_email)
+    if existing_email:
+        raise HTTPException(status_code=400, detail="이미 존재하는 이메일입니다.")
+    hashed_password = service.hash_password(request.password)
+    user = repository.save_user(repository.model.create(
+        user_id=request.user_id,
+        user_name=request.user_name,
+        hashed_password=hashed_password,
+        user_email=request.user_email
+    ))
+    return UserSchema.model_validate(user)
+
+@router.post("/log-in", response_model=UserSchema)
+def log_in(request: LogInRequest, repository: UserRepository = Depends(), service: UserService = Depends()):
+    user = repository.get_user_by_user_id(request.user_id)
+    if not user or not service.verify_password(request.password, user.user_pw):
+        raise HTTPException(status_code=401, detail="잘못된 인증 정보입니다.")
+    return UserSchema.model_validate(user)
+=======
 # POST 요청을 처리하는 회원가입(sign-up) 엔드포인트
 # /users/sign-up 경로에서 사용자를 등록
 @router.post("/sign-up", response_model=UserSchema)
@@ -54,3 +87,4 @@ def log_in(request: LogInRequest, repository: UserRepository = Depends(), servic
     
     # 로그인 성공 시 사용자 정보를 반환 (UserSchema로 변환)
     return UserSchema.model_validate(user)
+>>>>>>> develop

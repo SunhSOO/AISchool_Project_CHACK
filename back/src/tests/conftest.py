@@ -6,4 +6,8 @@ from main import app
 
 @pytest.fixture()
 def client():
+<<<<<<< HEAD
     return TestClient(app=app)
+=======
+    return TestClient(app=app)
+>>>>>>> develop

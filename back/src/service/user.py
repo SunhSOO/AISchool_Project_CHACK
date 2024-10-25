@@ -1,3 +1,26 @@
+<<<<<<< HEAD
+# service/user.py
+
+import bcrypt
+
+class UserService:
+    encoding: str = "UTF-8"
+
+    def hash_password(self, plain_password: str) -> str:
+        hashed_password: bytes = bcrypt.hashpw(
+            plain_password.encode(self.encoding),
+            salt=bcrypt.gensalt()
+        )
+        return hashed_password.decode(self.encoding)
+
+    def verify_password(
+            self, plain_password: str, hashed_password: str
+    ) -> bool:
+        return bcrypt.checkpw(
+            plain_password.encode(self.encoding),
+            hashed_password.encode(self.encoding)
+        )
+=======
 import bcrypt
 
 # 사용자 관련 기능을 제공하는 서비스 클래스
@@ -25,3 +48,4 @@ class UserService:
             hashed_password.encode(self.encoding)  # 해시화된 비밀번호를 바이트로 변환
         )
 
+>>>>>>> develop

@@ -10,8 +10,13 @@ class ClothesSchema(BaseModel):
     clo_name: str
     clo_desc: str
     clo_price: int
+<<<<<<< HEAD
+    clo_3d: Optional[str]
+    clo_img1: Optional[str] = None  # **새로운 필드 추가**
+=======
     clo_img: str  # 추가된 필드
     clo_3d: Optional[str]
+>>>>>>> develop
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
@@ -19,6 +24,11 @@ class ClothesSchema(BaseModel):
 class ClothesListSchema(BaseModel):
     clothes: List[ClothesSchema]
 
+<<<<<<< HEAD
+    model_config = ConfigDict(from_attributes=True)
+    
+=======
+>>>>>>> develop
 class UserSchema(BaseModel):
     user_id: str
     user_name: str
@@ -31,11 +41,24 @@ class UserSchema(BaseModel):
 class AvatarSchema(BaseModel):
     avatar_idx: int
     user_id: str
+<<<<<<< HEAD
+    avatar_path: Optional[str]  # 파일 경로
+    img_rname: str  # 원본 파일명
+    img_size: int
+    img_ext: str
+    created_at: datetime
+    height: Optional[int] = None  # **새로운 필드 추가**
+    weight: Optional[int] = None  # **새로운 필드 추가**
+    chest_circumference: Optional[float] = None  # **새로운 필드 추가**
+    waist_circumference: Optional[float] = None  # **새로운 필드 추가**
+    hip_circumference: Optional[float] = None  # **새로운 필드 추가**
+=======
     avatar_path: Optional[str]
     img_rname: str
     img_size: int
     img_ext: str
     created_at: datetime
+>>>>>>> develop
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -45,4 +68,8 @@ class FittingSchema(BaseModel):
     clo_idx: int
     created_at: datetime
 
+<<<<<<< HEAD
     model_config = ConfigDict(from_attributes=True)
+=======
+    model_config = ConfigDict(from_attributes=True)
+>>>>>>> develop
