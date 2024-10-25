@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// UserLooks.jsx (장바구니 페이지)
+import React from 'react';
 import {
   Box,
   VStack,
@@ -7,53 +8,18 @@ import {
   Text,
   Flex,
   IconButton,
+  Button,
 } from '@chakra-ui/react';
 import { DeleteIcon } from '@chakra-ui/icons';
-
-// 샘플 데이터 (5개만 표시)
-const initialLooks = [
-  {
-    id: 1,
-    title: 'Beige chic winter',
-    price: '459 TND',
-    size: 'US 7',
-    image: 'https://via.placeholder.com/150',
-  },
-  {
-    id: 2,
-    title: 'Party shiny red look',
-    price: '339 TND',
-    size: 'US 6',
-    image: 'https://via.placeholder.com/150',
-  },
-  {
-    id: 3,
-    title: 'Denim stylish look',
-    price: '299 TND',
-    size: 'US 8',
-    image: 'https://via.placeholder.com/150',
-  },
-  {
-    id: 4,
-    title: 'Black biker look',
-    price: '399 TND',
-    size: 'US 9',
-    image: 'https://via.placeholder.com/150',
-  },
-  {
-    id: 5,
-    title: 'Casual blue summer',
-    price: '259 TND',
-    size: 'US 10',
-    image: 'https://via.placeholder.com/150',
-  },
-];
+import { useCart } from '../components/CartContext';
 
 const UserLooks = () => {
-  const [looks] = useState(initialLooks.slice(0, 5)); // 초기 데이터 상태에서 5개만 표시
+  const { cartItems, removeFromCart } = useCart();
 
-  const handleRemove = (lookId) => {
-    alert(`아이템 ${lookId}가 삭제되었습니다.`);
+  const calculateTotal = () => {
+    return cartItems
+      .reduce((total, item) => total + parseFloat(item.price), 0)
+      .toFixed(2);
   };
 
   return (
@@ -68,9 +34,9 @@ const UserLooks = () => {
       mt={10}
     >
       <VStack spacing={4} align="stretch">
-        {looks.map((look) => (
+        {cartItems.map((item) => (
           <Flex
-            key={look.id}
+            key={item.id}
             bg="white"
             boxShadow="md"
             borderRadius="3xl"
@@ -90,17 +56,14 @@ const UserLooks = () => {
                 justifyContent="center"
                 overflow="hidden"
               >
-                <Image src={look.image} alt={look.title} boxSize="100%" />
+                <Image src={item.image} alt={item.title} boxSize="100%" />
               </Box>
               <VStack align="flex-start" spacing={1}>
                 <Text fontSize="lg" fontWeight="bold">
-                  {look.title}
+                  {item.title}
                 </Text>
                 <Text fontSize="md" color="gray.500">
-                  {look.price}
-                </Text>
-                <Text fontSize="sm" color="gray.700">
-                  Size: {look.size}
+                  ${item.price}
                 </Text>
               </VStack>
             </HStack>
@@ -111,10 +74,36 @@ const UserLooks = () => {
               borderRadius="full"
               bg="red.100"
               _hover={{ bg: 'red.200' }}
-              onClick={() => handleRemove(look.id)}
+              onClick={() => removeFromCart(item.id)}
             />
           </Flex>
         ))}
+        {cartItems.length > 0 && (
+          <Box p={4} borderTop="1px" borderColor="gray.200">
+            <HStack justify="space-between">
+              <Text fontSize="lg" fontWeight="bold">
+                Total:
+              </Text>
+              <Text fontSize="lg" fontWeight="bold">
+                ${calculateTotal()}
+              </Text>
+            </HStack>
+            <Button
+              colorScheme="red"
+              size="lg"
+              width="100%"
+              mt={4}
+              onClick={() => alert('Proceeding to checkout...')}
+            >
+              Checkout
+            </Button>
+          </Box>
+        )}
+        {cartItems.length === 0 && (
+          <Text textAlign="center" color="gray.500" py={8}>
+            Your cart is empty
+          </Text>
+        )}
       </VStack>
     </Box>
   );

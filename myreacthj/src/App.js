@@ -7,6 +7,7 @@ import {
   useLocation,
 } from 'react-router-dom';
 import { ChakraProvider, Box } from '@chakra-ui/react';
+import { CartProvider } from '../src/components/CartContext'; // CartContext import 추가
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -19,25 +20,22 @@ import UserLooks from './pages/UserLooks';
 import SignupComponent from './pages/SignupComponent';
 import MyPage from './pages/MyPage';
 import LooksGallery from './pages/LooksGallery';
-import Avatar from './pages/Avater'; // Avatar 페이지 컴포넌트 가져오기
-import MeasurementForm from './components/MeasurementForm'; // MeasurementForm 컴포넌트
+import Avatar from './pages/Avater';
+import MeasurementForm from './components/MeasurementForm';
 import Login from './pages/Login';
 
 const AppLayout = ({ children }) => {
   const location = useLocation();
 
-  // 로그인 페이지, 동의 페이지, 회원가입 페이지에서는 헤더와 푸터를 렌더링하지 않음
   const isExcludedPage =
     location.pathname === '/' ||
     location.pathname === '/agreement' ||
     location.pathname === '/signup' ||
-    location.pathname === '/login'; // 로그인 페이지도 제외
+    location.pathname === '/login';
 
   return (
     <>
       {!isExcludedPage && <Header />}
-      {/* 헤더는 로그인, 동의, 회원가입 페이지에서 제외 */}
-
       <Box
         minH="100vh"
         pt={!isExcludedPage ? '20px' : '0'}
@@ -48,9 +46,7 @@ const AppLayout = ({ children }) => {
       >
         {children}
       </Box>
-
       {!isExcludedPage && <Footer />}
-      {/* 푸터는 로그인, 동의, 회원가입 페이지에서 제외 */}
     </>
   );
 };
@@ -58,38 +54,29 @@ const AppLayout = ({ children }) => {
 const App = () => {
   return (
     <ChakraProvider>
-      <Router>
-        <AppLayout>
-          <Routes>
-            {/* 로그인 페이지 */}
-            <Route path="/" element={<LoginPage />} />
-            {/* 동의 페이지 */}
-            <Route path="/agreement" element={<AgreementPage />} />
-            {/* 로그인 페이지 */}
-            <Route path="/Login" element={<Login />} />
-            {/* 홈 페이지 */}
-            <Route path="/home" element={<Home />} />
-            {/* 쇼핑 페이지 경로 */}
-            <Route path="/ShoppingPage" element={<ShoppingPage />} />
-            {/* 카테고리 페이지 */}
-            <Route path="/category/:category" element={<CategoryPage />} />
-            {/* UserLooks 페이지 경로 추가 */}
-            <Route path="/UserLooks" element={<UserLooks />} />
-            {/* 회원가입 경로 */}
-            <Route path="/signup" element={<SignupComponent />} />
-            {/* 404 페이지 경로 */}
-            <Route path="*" element={<NotFound />} />
-            {/* 갤러리 경로 */}
-            <Route path="/looksgallery" element={<LooksGallery />} />
-            {/* MyPage 경로 */}
-            <Route path="/mypage" element={<MyPage />} />
-            {/* Avatar 페이지 경로 */}
-            <Route path="/avatar" element={<Avatar />} />
-            {/* 신체사이즈 수정 경로 */}
-            <Route path="/measurement-form" element={<MeasurementForm />} />
-          </Routes>
-        </AppLayout>
-      </Router>
+      <CartProvider>
+        {' '}
+        {/* CartProvider 추가 */}
+        <Router>
+          <AppLayout>
+            <Routes>
+              <Route path="/" element={<LoginPage />} />
+              <Route path="/agreement" element={<AgreementPage />} />
+              <Route path="/Login" element={<Login />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/ShoppingPage" element={<ShoppingPage />} />
+              <Route path="/category/:category" element={<CategoryPage />} />
+              <Route path="/UserLooks" element={<UserLooks />} />
+              <Route path="/signup" element={<SignupComponent />} />
+              <Route path="*" element={<NotFound />} />
+              <Route path="/looksgallery" element={<LooksGallery />} />
+              <Route path="/mypage" element={<MyPage />} />
+              <Route path="/avatar" element={<Avatar />} />
+              <Route path="/measurement-form" element={<MeasurementForm />} />
+            </Routes>
+          </AppLayout>
+        </Router>
+      </CartProvider>
     </ChakraProvider>
   );
 };
