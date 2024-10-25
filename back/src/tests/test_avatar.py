@@ -1,5 +1,6 @@
 # tests/test_avatar.py
 
+<<<<<<< HEAD
 import os
 from fastapi.testclient import TestClient
 
@@ -72,3 +73,23 @@ def test_delete_avatar(client: TestClient):
     avatars = get_response.json()
     assert all(avatar["avatar_idx"] != avatar_id for avatar in avatars)
     print(f"Verified Avatar with ID {avatar_id} has been deleted.")
+=======
+def test_create_avatar(client):
+    response = client.post(
+        "/avatars/",
+        json={
+            "user_id": "user123",
+            "avatar_path": "path/to/avatar",
+            "img_rname": "avatar_image.jpg",
+            "img_size": 1024,
+            "img_ext": ".jpg"
+        }
+    )
+    assert response.status_code == 200
+    print("Create Avatar Response:", response.json())
+
+def test_get_avatars(client):
+    response = client.get("/avatars/", params={"user_id": "user123"})
+    assert response.status_code == 200
+    print("Get Avatars Response:", response.json())
+>>>>>>> develop
