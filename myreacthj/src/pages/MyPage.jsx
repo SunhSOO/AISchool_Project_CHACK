@@ -8,6 +8,15 @@ import {
   Button,
   HStack,
   Icon,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  Input,
+  useDisclosure,
 } from '@chakra-ui/react';
 import { FaUserEdit } from 'react-icons/fa';
 import { FiLogOut } from 'react-icons/fi';
@@ -16,28 +25,54 @@ import { useNavigate } from 'react-router-dom';
 
 const MyPage = () => {
   const navigate = useNavigate();
+  const {
+    isOpen: isEditOpen,
+    onOpen: onEditOpen,
+    onClose: onEditClose,
+  } = useDisclosure();
+  const {
+    isOpen: isCartOpen,
+    onOpen: onCartOpen,
+    onClose: onCartClose,
+  } = useDisclosure();
+
   const [userData, setUserData] = useState({
     username: '',
     email: '',
   });
 
+  const [editedUserData, setEditedUserData] = useState({
+    username: '',
+    email: '',
+  });
+
   useEffect(() => {
-    // 로그인 정보를 localStorage에서 가져옴
     const username = localStorage.getItem('username') || '이현준';
     const email = localStorage.getItem('email') || '이메일@example.com';
 
     if (username && email) {
       setUserData({ username, email });
+      setEditedUserData({ username, email });
     } else {
-      // 로그인 정보가 없으면 로그인 페이지로 리디렉션
       navigate('/');
     }
   }, [navigate]);
 
   const handleLogout = () => {
-    // 로그아웃 시 localStorage 데이터 초기화 후 로그인 페이지로 이동
     localStorage.clear();
     navigate('/');
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditedUserData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleEditSave = () => {
+    setUserData(editedUserData);
+    localStorage.setItem('username', editedUserData.username);
+    localStorage.setItem('email', editedUserData.email);
+    onEditClose();
   };
 
   return (
@@ -77,6 +112,7 @@ const MyPage = () => {
           variant="ghost"
           color="white"
           leftIcon={<FaUserEdit />}
+          onClick={onEditOpen}
         >
           수정
         </Button>
@@ -91,6 +127,8 @@ const MyPage = () => {
           borderRadius="2xl"
           display="flex"
           alignItems="center"
+          onClick={onCartOpen}
+          cursor="pointer"
         >
           <HStack>
             <Icon as={MdAccountCircle} boxSize={6} color="gray.600" />
@@ -126,6 +164,55 @@ const MyPage = () => {
           </HStack>
         </Box>
       </VStack>
+
+      {/* 정보 수정 모달 */}
+      <Modal isOpen={isEditOpen} onClose={onEditClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>정보 수정</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <VStack spacing={4}>
+              <Input
+                placeholder="사용자 이름"
+                name="username"
+                value={editedUserData.username}
+                onChange={handleEditChange}
+              />
+              <Input
+                placeholder="이메일"
+                name="email"
+                value={editedUserData.email}
+                onChange={handleEditChange}
+              />
+            </VStack>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="red" mr={3} onClick={handleEditSave}>
+              저장
+            </Button>
+            <Button onClick={onEditClose}>취소</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* 장바구니 정보 모달 */}
+      <Modal isOpen={isCartOpen} onClose={onCartClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>장바구니 정보</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>장바구니에 담긴 상품 정보가 여기에 표시됩니다.</Text>
+            {/* 실제 장바구니 정보를 나중에 여기에 추가 */}
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" onClick={onCartClose}>
+              닫기
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 };
