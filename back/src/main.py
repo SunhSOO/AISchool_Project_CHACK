@@ -1,40 +1,55 @@
+# main.py
+
 import logging
-from fastapi import FastAPI
-from api import clothes, user, avatar, fitting  # API 모듈로부터 라우터 임포트
+from fastapi import FastAPI, Request, HTTPException  # HTTPException 추가
+from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+from api import clothes, user, avatar, fitting, files
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 # 로깅 설정
-# 애플리케이션에서 정보를 기록할 수 있도록 로깅을 설정
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.StreamHandler()
+    ]
+)
 logger = logging.getLogger(__name__)
 
-# FastAPI 애플리케이션 인스턴스 생성
 app = FastAPI()
 
-from fastapi.middleware.cors import CORSMiddleware
+# CORS 설정
+origins_str = os.getenv("ALLOWED_ORIGINS", "")
+origins = origins_str.split(",") if origins_str else []
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # React 애플리케이션이 실행되는 주소
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# 옷(clothes) 관련 API 라우터 등록
 app.include_router(clothes.router)
-# 사용자(user) 관련 API 라우터 등록
 app.include_router(user.router)
-# 아바타(avatar) 관련 API 라우터 등록
-app.include_router(avatar.router)  
-# 피팅(fitting) 관련 API 라우터 등록
-app.include_router(fitting.router) 
+app.include_router(avatar.router)
+app.include_router(fitting.router)
+app.include_router(files.router)
 
-# 헬스 체크 엔드포인트
-# 이 엔드포인트는 서버가 정상적으로 작동하는지 확인하는 용도로 사용
 @app.get("/")
-def health_check_handler():
-    # 헬스 체크 요청이 들어오면 로그를 남김
+async def health_check_handler():  # 수정: async로 변경
     logger.info("Health check called")
-    # 서버 상태를 나타내는 JSON 응답 반환
     return {"ping": "pong"}
 
+# 추가: 글로벌 에러 핸들러
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    logger.error(f"HTTP error occurred: {exc.detail}")
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
+    )

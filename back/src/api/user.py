@@ -1,56 +1,63 @@
-from fastapi import APIRouter, Depends, HTTPException
+# api/user.py
 
+from fastapi import APIRouter, Depends, HTTPException, Request  # Request 추가
 from database.repository import UserRepository
 from schema.request import SignUpRequest, LogInRequest
-from schema.response import UserSchema
+from schema.response import UserSchema, Token
 from service.user import UserService
+from security import create_access_token, get_current_user
+from datetime import timedelta
+from dotenv import load_dotenv
+import os
+# User 클래스 임포트 추가
+from database.orm import User  # 프로젝트 구조에 맞게 경로 수정
 
-# FastAPI의 APIRouter 객체 생성
-# prefix: "/users"로 설정하면 모든 경로가 "/users"로 시작됨
-# tags: OpenAPI 문서에서 'Users' 태그 아래에 이 API들이 표시됨
+load_dotenv()
+
 router = APIRouter(
     prefix="/users",
     tags=["Users"],
 )
 
-# POST 요청을 처리하는 회원가입(sign-up) 엔드포인트
-# /users/sign-up 경로에서 사용자를 등록
 @router.post("/sign-up", response_model=UserSchema)
-def sign_up(request: SignUpRequest, repository: UserRepository = Depends(), service: UserService = Depends()):
-    # 전달된 사용자 ID로 기존 사용자가 있는지 확인
-    existing_user = repository.get_user_by_user_id(request.user_id)
+async def sign_up(
+    request: Request,  # 수정: Request 추가하여 base_url 사용 (기본 인자 먼저)
+    signup_request: SignUpRequest,
+    repository: UserRepository = Depends(),
+    service: UserService = Depends()
+):
+    existing_user = repository.get_user_by_user_id(signup_request.user_id)
     if existing_user:
         raise HTTPException(status_code=400, detail="이미 존재하는 사용자 ID입니다.")
-    
-    # 전달된 이메일로 기존 사용자가 있는지 확인
-    existing_email = repository.get_user_by_user_email(request.user_email)
+    existing_email = repository.get_user_by_user_email(signup_request.user_email)
     if existing_email:
         raise HTTPException(status_code=400, detail="이미 존재하는 이메일입니다.")
-    
-    # 비밀번호를 해시 처리
-    hashed_password = service.hash_password(request.password)
-    
-    # 새로운 사용자 생성 및 저장
+    hashed_password = service.hash_password(signup_request.password)
     user = repository.save_user(repository.model.create(
-        user_id=request.user_id,
-        user_name=request.user_name,
-        hashed_password=hashed_password,  # 해시된 비밀번호 저장
-        user_email=request.user_email
+        user_id=signup_request.user_id,
+        user_name=signup_request.user_name,
+        hashed_password=hashed_password,
+        user_email=signup_request.user_email
     ))
-    
-    # 생성된 사용자 정보를 반환 (UserSchema로 변환)
     return UserSchema.model_validate(user)
 
-# POST 요청을 처리하는 로그인(log-in) 엔드포인트
-# /users/log-in 경로에서 사용자가 로그인을 시도
-@router.post("/log-in", response_model=UserSchema)
-def log_in(request: LogInRequest, repository: UserRepository = Depends(), service: UserService = Depends()):
-    # 전달된 사용자 ID로 사용자를 조회
-    user = repository.get_user_by_user_id(request.user_id)
-    
-    # 사용자가 존재하지 않거나 비밀번호가 일치하지 않으면 401 오류 반환
-    if not user or not service.verify_password(request.password, user.user_pw):
+@router.post("/log-in", response_model=Token)
+async def log_in(
+    request: Request,  # 수정: Request 추가하여 base_url 사용 (기본 인자 먼저)
+    login_request: LogInRequest,
+    repository: UserRepository = Depends(),
+    service: UserService = Depends()
+):
+    user = repository.get_user_by_user_id(login_request.user_id)
+    if not user or not service.verify_password(login_request.password, user.user_pw):
         raise HTTPException(status_code=401, detail="잘못된 인증 정보입니다.")
-    
-    # 로그인 성공 시 사용자 정보를 반환 (UserSchema로 변환)
-    return UserSchema.model_validate(user)
+    access_token_expires = timedelta(minutes=int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30)))
+    access_token = create_access_token(
+        data={"sub": user.user_id}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+# 예시: 보호된 엔드포인트 추가
+@router.get("/me", response_model=UserSchema)
+async def read_users_me(request: Request, current_user: User = Depends(get_current_user)):  # 수정: async 및 Request 추가
+    return UserSchema.model_validate(current_user)

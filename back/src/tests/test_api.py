@@ -31,7 +31,10 @@ def test_login(client):
 def test_create_clothes(client):
     response = client.post(
         "/clothes/",
-        json={
+        files={
+            "clo_img1": ("clothes_image1.jpg", open("path/to/local/clothes_image1.jpg", "rb"), "image/jpeg")
+        },
+        data={
             "clo_name": "티셔츠",
             "clo_desc": "멋진 티셔츠입니다.",
             "clo_price": 50000,
@@ -45,4 +48,3 @@ def test_get_clothes(client):
     response = client.get("/clothes/")
     assert response.status_code == 200
     print("Get Clothes Response:", response.json())
-
