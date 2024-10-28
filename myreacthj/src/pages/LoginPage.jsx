@@ -87,7 +87,7 @@ const LoginPage = () => {
         </Button>
 
         <Text fontSize={['xs', 'sm']} fontWeight="light">
-          <Link href="/signup" textDecoration="underline">
+          <Link href="/login" textDecoration="underline">
             계정으로 로그인 하기
           </Link>
         </Text>
