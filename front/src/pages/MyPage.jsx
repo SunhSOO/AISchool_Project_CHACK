@@ -1,4 +1,5 @@
 // src/pages/MyPage.jsx
+
 import React, { useEffect, useState } from 'react';
 import {
   Box,
@@ -47,9 +48,10 @@ const MyPage = () => {
   });
 
   useEffect(() => {
+    console.log('User data in MyPage:', user); // 사용자 데이터 확인
     const savedHistory = localStorage.getItem('purchaseHistory');
     if (savedHistory) setPurchaseHistory(JSON.parse(savedHistory));
-  }, []);
+  }, [user]);
 
   const handleLogout = () => logout();
 
@@ -65,7 +67,6 @@ const MyPage = () => {
   };
 
   if (loading) {
-    // 로딩 중일 때 스피너 표시
     return (
       <Box
         display="flex"
@@ -164,6 +165,7 @@ const MyPage = () => {
         </Box>
       </VStack>
 
+      {/* Modal for editing user info */}
       <Modal isOpen={isEditOpen} onClose={onEditClose}>
         <ModalOverlay />
         <ModalContent>
@@ -194,6 +196,7 @@ const MyPage = () => {
         </ModalContent>
       </Modal>
 
+      {/* Modal for purchase history */}
       <Modal isOpen={isPurchaseOpen} onClose={onPurchaseClose}>
         <ModalOverlay />
         <ModalContent>

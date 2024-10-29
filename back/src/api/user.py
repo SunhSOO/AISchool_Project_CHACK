@@ -57,7 +57,6 @@ async def log_in(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-# 예시: 보호된 엔드포인트 추가
 @router.get("/me", response_model=UserSchema)
-async def read_users_me(request: Request, current_user: User = Depends(get_current_user)):  # 수정: async 및 Request 추가
-    return UserSchema.model_validate(current_user)
+async def read_users_me(request: Request, current_user: User = Depends(get_current_user)):
+    return current_user  # Pydantic 모델이 자동으로 변환하도록 함

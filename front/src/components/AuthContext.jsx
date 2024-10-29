@@ -1,9 +1,9 @@
 // src/components/AuthContext.js
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-// Axios instance 생성
 const axiosInstance = axios.create({
   baseURL: 'http://localhost:8000',
   headers: {
@@ -17,7 +17,7 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token'));
-  const [loading, setLoading] = useState(true); // loading 상태 추가
+  const [loading, setLoading] = useState(true); // 로딩 상태 추가
   const navigate = useNavigate();
 
   const login = async (loginData) => {
@@ -32,8 +32,7 @@ export const AuthProvider = ({ children }) => {
         'Authorization'
       ] = `Bearer ${accessToken}`;
 
-      // 사용자 정보 가져오기
-      await fetchUserData();
+      await fetchUserData(); // 사용자 정보 가져오기
     } catch (error) {
       console.error('Login failed:', error);
     }
@@ -41,10 +40,11 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUserData = async () => {
     try {
-      setLoading(true); // 로딩 시작
+      console.log('Fetching user data with token:', token); // 토큰 확인
       const response = await axiosInstance.get('/users/me', {
         headers: { Authorization: `Bearer ${token}` },
       });
+      console.log('User data fetched from server:', response.data); // 사용자 데이터 확인
       setUser(response.data);
     } catch (error) {
       console.error('Failed to fetch user data:', error);
@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }) => {
       ] = `Bearer ${token}`;
       fetchUserData();
     } else {
-      setLoading(false); // 토큰이 없는 경우에도 로딩 완료로 설정
+      setLoading(false); // 토큰이 없을 때도 로딩 종료
     }
   }, [token]);
 
