@@ -1,4 +1,4 @@
-// MyPage.jsx
+// src/pages/MyPage.jsx
 import React, { useEffect, useState } from 'react';
 import {
   Box,
@@ -18,6 +18,7 @@ import {
   ModalFooter,
   useDisclosure,
   Input,
+  Spinner,
 } from '@chakra-ui/react';
 import { FaUserEdit } from 'react-icons/fa';
 import { FiLogOut } from 'react-icons/fi';
@@ -26,9 +27,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../components/AuthContext';
 
 const MyPage = () => {
-  const { user, logout } = useAuth(); // useAuth를 통해 user와 logout 사용
+  const { user, logout, loading } = useAuth(); // loading 상태 가져오기
   const navigate = useNavigate();
-
   const {
     isOpen: isEditOpen,
     onOpen: onEditOpen,
@@ -40,23 +40,18 @@ const MyPage = () => {
     onClose: onPurchaseClose,
   } = useDisclosure();
 
-  const [userData, setUserData] = useState({
-    username: user || '이현준',
-    email: localStorage.getItem('email') || '이메일@example.com',
-  });
-
-  const [editedUserData, setEditedUserData] = useState(userData);
   const [purchaseHistory, setPurchaseHistory] = useState([]);
+  const [editedUserData, setEditedUserData] = useState({
+    username: user?.username || '',
+    email: user?.email || '',
+  });
 
   useEffect(() => {
     const savedHistory = localStorage.getItem('purchaseHistory');
     if (savedHistory) setPurchaseHistory(JSON.parse(savedHistory));
   }, []);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
+  const handleLogout = () => logout();
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
@@ -64,11 +59,24 @@ const MyPage = () => {
   };
 
   const handleEditSave = () => {
-    setUserData(editedUserData);
     localStorage.setItem('username', editedUserData.username);
     localStorage.setItem('email', editedUserData.email);
     onEditClose();
   };
+
+  if (loading) {
+    // 로딩 중일 때 스피너 표시
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+      >
+        <Spinner size="xl" />
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -93,12 +101,12 @@ const MyPage = () => {
         color="white"
         mb={6}
       >
-        <Avatar size="lg" name={userData.username} />
+        <Avatar size="lg" name={user?.username} />
         <Box ml={4}>
           <Heading as="h2" size="md" color="white">
-            {userData.username}
+            {user?.username || 'Guest'}
           </Heading>
-          <Text>{userData.email}</Text>
+          <Text>{user?.email || 'No email available'}</Text>
         </Box>
         <Button
           ml="auto"

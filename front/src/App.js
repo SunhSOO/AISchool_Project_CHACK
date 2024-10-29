@@ -1,4 +1,3 @@
-// src/App.js
 import React from 'react';
 import {
   BrowserRouter as Router,
@@ -7,8 +6,8 @@ import {
   useLocation,
 } from 'react-router-dom';
 import { ChakraProvider, Box } from '@chakra-ui/react';
-import { CartProvider } from '../src/components/CartContext'; // CartContext import
-import { AuthProvider } from './components/AuthContext'; // AuthProvider import 추가
+import { CartProvider } from '../src/components/CartContext';
+import { AuthProvider } from './components/AuthContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -56,18 +55,16 @@ const AppLayout = ({ children }) => {
 const App = () => {
   return (
     <ChakraProvider>
-      <AuthProvider>
-        {' '}
-        {/* AuthProvider로 애플리케이션 전체를 래핑 */}
-        <CartProvider>
+      <Router>
+        <AuthProvider>
           {' '}
-          {/* CartProvider 추가 */}
-          <Router>
+          {/* AuthProvider를 Router 내부로 이동 */}
+          <CartProvider>
             <AppLayout>
               <Routes>
                 <Route path="/" element={<LoginPage />} />
                 <Route path="/agreement" element={<AgreementPage />} />
-                <Route path="/Login" element={<Login />} />
+                <Route path="/login" element={<Login />} />
                 <Route path="/home" element={<Home />} />
                 <Route path="/ShoppingPage" element={<ShoppingPage />} />
                 <Route path="/category/:category" element={<CategoryPage />} />
@@ -81,9 +78,9 @@ const App = () => {
                 <Route path="/checkout" element={<CheckoutPage />} />
               </Routes>
             </AppLayout>
-          </Router>
-        </CartProvider>
-      </AuthProvider>
+          </CartProvider>
+        </AuthProvider>
+      </Router>
     </ChakraProvider>
   );
 };
