@@ -1,3 +1,5 @@
+// src/pages/Login.jsx
+
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -16,18 +18,10 @@ import {
 } from '@chakra-ui/react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { ArrowBackIcon } from '@chakra-ui/icons';
-import axios from 'axios';
-
-// axios 기본 설정
-const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8000',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  withCredentials: true,
-});
+import { useAuth } from '../components/AuthContext';
 
 const Login = () => {
+  const { login } = useAuth();
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -38,11 +32,7 @@ const Login = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      // 토큰이 있으면 자동으로 홈으로 리다이렉트
-      axiosInstance.defaults.headers.common[
-        'Authorization'
-      ] = `Bearer ${token}`;
-      navigate('/home');
+      navigate('/home'); // 이미 로그인된 경우 홈으로 이동
     }
   }, [navigate]);
 
@@ -56,59 +46,30 @@ const Login = () => {
         password: password,
       };
 
-      console.log('Sending login data:', loginData);
+      await login(loginData); // AuthContext의 login 함수 호출
 
-      const response = await axiosInstance.post('/users/log-in', loginData);
+      toast({
+        title: '로그인 성공!',
+        description: '홈페이지로 이동합니다.',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
 
-      console.log('Login response:', response);
-
-      if (response.data && response.data.access_token) {
-        // 토큰 저장
-        localStorage.setItem('token', response.data.access_token);
-
-        // 토큰을 헤더에 추가
-        axiosInstance.defaults.headers.common[
-          'Authorization'
-        ] = `Bearer ${response.data.access_token}`;
-
-        try {
-          // 사용자 정보 가져오기
-          const userResponse = await axiosInstance.get('/users/me');
-          if (userResponse.data) {
-            localStorage.setItem('user_id', userResponse.data.user_id);
-            localStorage.setItem('user_name', userResponse.data.user_name);
-            localStorage.setItem('user_email', userResponse.data.user_email);
-          }
-        } catch (userError) {
-          console.error('사용자 정보 가져오기 실패:', userError);
-        }
-
-        toast({
-          title: '로그인 성공!',
-          description: '홈페이지로 이동합니다.',
-          status: 'success',
-          duration: 3000,
-          isClosable: true,
-        });
-
-        navigate('/home');
-      }
+      navigate('/home');
     } catch (error) {
       console.error('Login error:', error);
 
       let errorMessage = '로그인 중 문제가 발생했습니다.';
       if (error.response) {
-        // 서버에서 응답이 왔지만 에러가 있는 경우
         errorMessage = error.response.data?.detail || errorMessage;
 
-        // 특정 상태 코드에 따른 메시지 처리
         if (error.response.status === 401) {
           errorMessage = '아이디 또는 비밀번호가 올바르지 않습니다.';
         } else if (error.response.status === 400) {
           errorMessage = '입력값을 확인해주세요.';
         }
       } else if (error.request) {
-        // 요청은 보냈지만 응답을 받지 못한 경우
         errorMessage = '서버에 연결할 수 없습니다.';
       }
 
@@ -124,7 +85,6 @@ const Login = () => {
     }
   };
 
-  // Form validation
   const isFormValid = userId.trim() !== '' && password.trim() !== '';
 
   return (

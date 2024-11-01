@@ -17,7 +17,7 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token'));
-  const [loading, setLoading] = useState(true); // 로딩 상태 추가
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const login = async (loginData) => {
@@ -25,31 +25,27 @@ export const AuthProvider = ({ children }) => {
       const response = await axiosInstance.post('/users/log-in', loginData);
       const accessToken = response.data.access_token;
 
-      // 토큰 저장 및 헤더에 추가
+      // 토큰 저장 및 상태 업데이트
       localStorage.setItem('token', accessToken);
       setToken(accessToken);
-      axiosInstance.defaults.headers.common[
-        'Authorization'
-      ] = `Bearer ${accessToken}`;
 
-      await fetchUserData(); // 사용자 정보 가져오기
+      // 사용자 정보 가져오기 및 설정
+      await fetchUserData(accessToken);
     } catch (error) {
       console.error('Login failed:', error);
     }
   };
 
-  const fetchUserData = async () => {
+  const fetchUserData = async (accessToken) => {
     try {
-      console.log('Fetching user data with token:', token); // 토큰 확인
       const response = await axiosInstance.get('/users/me', {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
-      console.log('User data fetched from server:', response.data); // 사용자 데이터 확인
-      setUser(response.data);
+      setUser(response.data); // 사용자 정보를 user 상태에 저장
     } catch (error) {
       console.error('Failed to fetch user data:', error);
     } finally {
-      setLoading(false); // 로딩 완료
+      setLoading(false);
     }
   };
 
@@ -62,12 +58,9 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     if (token) {
-      axiosInstance.defaults.headers.common[
-        'Authorization'
-      ] = `Bearer ${token}`;
-      fetchUserData();
+      fetchUserData(token);
     } else {
-      setLoading(false); // 토큰이 없을 때도 로딩 종료
+      setLoading(false);
     }
   }, [token]);
 

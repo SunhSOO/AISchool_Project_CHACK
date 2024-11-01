@@ -102,12 +102,12 @@ const MyPage = () => {
         color="white"
         mb={6}
       >
-        <Avatar size="lg" name={user?.username} />
+        <Avatar size="lg" name={user?.user_name || 'Guest'} />
         <Box ml={4}>
           <Heading as="h2" size="md" color="white">
-            {user?.username || 'Guest'}
+            {user?.user_name || 'Guest'}
           </Heading>
-          <Text>{user?.email || 'No email available'}</Text>
+          <Text>{user?.user_email || 'No email available'}</Text>
         </Box>
         <Button
           ml="auto"
