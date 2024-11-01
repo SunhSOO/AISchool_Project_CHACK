@@ -19,17 +19,14 @@ import {
   ModalFooter,
   useDisclosure,
   Input,
-  Spinner,
 } from '@chakra-ui/react';
 import { FaUserEdit } from 'react-icons/fa';
 import { FiLogOut } from 'react-icons/fi';
 import { MdAccountCircle } from 'react-icons/md';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../components/AuthContext';
 
 const MyPage = () => {
-  const { user, logout, loading } = useAuth(); // loading 상태 가져오기
-  const navigate = useNavigate();
+  const { user, logout } = useAuth(); // loading 제거
   const {
     isOpen: isEditOpen,
     onOpen: onEditOpen,
@@ -43,15 +40,14 @@ const MyPage = () => {
 
   const [purchaseHistory, setPurchaseHistory] = useState([]);
   const [editedUserData, setEditedUserData] = useState({
-    username: user?.username || '',
-    email: user?.email || '',
+    user_name: user?.user_name || '',
+    user_email: user?.user_email || '',
   });
 
   useEffect(() => {
-    console.log('User data in MyPage:', user); // 사용자 데이터 확인
     const savedHistory = localStorage.getItem('purchaseHistory');
     if (savedHistory) setPurchaseHistory(JSON.parse(savedHistory));
-  }, [user]);
+  }, []);
 
   const handleLogout = () => logout();
 
@@ -61,23 +57,10 @@ const MyPage = () => {
   };
 
   const handleEditSave = () => {
-    localStorage.setItem('username', editedUserData.username);
-    localStorage.setItem('email', editedUserData.email);
+    localStorage.setItem('user_name', editedUserData.user_name);
+    localStorage.setItem('user_email', editedUserData.user_email);
     onEditClose();
   };
-
-  if (loading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
-      >
-        <Spinner size="xl" />
-      </Box>
-    );
-  }
 
   return (
     <Box
@@ -175,14 +158,14 @@ const MyPage = () => {
             <VStack spacing={4}>
               <Input
                 placeholder="사용자 이름"
-                name="username"
-                value={editedUserData.username}
+                name="user_name"
+                value={editedUserData.user_name}
                 onChange={handleEditChange}
               />
               <Input
                 placeholder="이메일"
-                name="email"
-                value={editedUserData.email}
+                name="user_email"
+                value={editedUserData.user_email}
                 onChange={handleEditChange}
               />
             </VStack>

@@ -1,3 +1,5 @@
+// src/pages/CategoryMenu.jsx
+
 import React from 'react';
 import { HStack, Box, Image, Text } from '@chakra-ui/react';
 import { Link as RouterLink } from 'react-router-dom';
@@ -7,7 +9,6 @@ import dressesImage from '../assets/category-dresses.jpg';
 import shirtImage from '../assets/category-shirts.jpg';
 import shoesImage from '../assets/category-shoes.jpg';
 
-// 카테고리 이미지 및 텍스트 정보 배열
 const categories = [
   {
     name: 'Pants',
@@ -22,7 +23,7 @@ const categories = [
     image: dressesImage,
   },
   {
-    name: 'Shirt',
+    name: 'Shirts',
     image: shirtImage,
   },
   {
@@ -39,10 +40,9 @@ const CategoryMenu = () => {
       boxShadow="sm"
       borderRadius="lg"
       mt={4}
-      maxW={{ base: '350px', md: '600px', lg: '800px' }} // 화면 크기에 따라 조정
-      mx="auto" // 수평 중앙 정렬
+      maxW={{ base: '350px', md: '600px', lg: '800px' }}
+      mx="auto"
     >
-      {/* "Categories" 텍스트 추가 */}
       <Text
         fontFamily={'Pretendard'}
         fontSize="2xl"
@@ -53,18 +53,16 @@ const CategoryMenu = () => {
         카테고리
       </Text>
 
-      {/* 카테고리 HStack */}
       <HStack
-        overflowX="auto"
+        overflowX="scroll" // 가로 스크롤을 명확하게 설정
         spacing={4}
-        p={4}
         bg="white"
         boxShadow="sm"
-        maxW={{ base: '350px', md: '600px', lg: '800px' }} // 화면 크기에 따라 조정
-        mx="auto" // 수평 중앙 정렬
+        maxW="full" // 전체 너비로 설정
+        mx="auto"
         mb={6}
         borderRadius="lg"
-        justifyContent="center" // HStack 내부 아이템을 가운데 정렬
+        justifyContent="start"
         css={{
           '&::-webkit-scrollbar': {
             height: '8px',
@@ -82,15 +80,14 @@ const CategoryMenu = () => {
           <Box
             key={index}
             as={RouterLink}
-            to={`/Home/${category.name.toLowerCase()}`}
+            to={`/category/${category.name.toLowerCase()}`}
             textAlign="center"
             flexShrink="0"
-            minW="120px"
+            minW="fit-content" // 버튼 너비를 fit-content로 설정하여 잘리지 않게 함
             display="flex"
             flexDirection="column"
             alignItems="center"
           >
-            {/* 카테고리 이미지를 감싸는 Box */}
             <Box
               width="100px"
               height="100px"
@@ -107,8 +104,7 @@ const CategoryMenu = () => {
                 objectFit="cover"
               />
             </Box>
-            {/* 카테고리 이름 */}
-            <Text fontSize="sm" fontWeight="medium">
+            <Text fontSize="sm" fontWeight="medium" whiteSpace="nowrap">
               {category.name}
             </Text>
           </Box>

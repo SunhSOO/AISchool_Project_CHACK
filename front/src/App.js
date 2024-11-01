@@ -5,6 +5,7 @@ import {
   Routes,
   useLocation,
 } from 'react-router-dom';
+import './App.css'; // app.css 파일 불러오기
 import { ChakraProvider, Box } from '@chakra-ui/react';
 import { CartProvider } from '../src/components/CartContext';
 import { AuthProvider } from './components/AuthContext';
@@ -67,7 +68,10 @@ const App = () => {
                 <Route path="/login" element={<Login />} />
                 <Route path="/home" element={<Home />} />
                 <Route path="/ShoppingPage" element={<ShoppingPage />} />
-                <Route path="/category/:category" element={<CategoryPage />} />
+                <Route
+                  path="/category/:categoryName"
+                  element={<CategoryPage />}
+                />
                 <Route path="/UserLooks" element={<UserLooks />} />
                 <Route path="/signup" element={<SignupComponent />} />
                 <Route path="*" element={<NotFound />} />

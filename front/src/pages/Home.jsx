@@ -7,7 +7,7 @@ import PromotionBanner from '../components/PromotionBanner';
 
 const Home = () => {
   return (
-    <Box pt="60px" pb="60px" maxW="container.md" mx="auto">
+    <Box pt="50px" pb="50px" maxW="container.md" mx="auto">
       <CategoryMenu />
       <Banner />
       <PromotionBanner />

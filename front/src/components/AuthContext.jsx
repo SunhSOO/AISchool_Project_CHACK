@@ -16,7 +16,9 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [token, setToken] = useState(() => {
+    return sessionStorage.getItem('token') || localStorage.getItem('token');
+  });
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -25,11 +27,10 @@ export const AuthProvider = ({ children }) => {
       const response = await axiosInstance.post('/users/log-in', loginData);
       const accessToken = response.data.access_token;
 
-      // 토큰 저장 및 상태 업데이트
+      sessionStorage.setItem('token', accessToken);
       localStorage.setItem('token', accessToken);
       setToken(accessToken);
 
-      // 사용자 정보 가져오기 및 설정
       await fetchUserData(accessToken);
     } catch (error) {
       console.error('Login failed:', error);
@@ -41,15 +42,17 @@ export const AuthProvider = ({ children }) => {
       const response = await axiosInstance.get('/users/me', {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
-      setUser(response.data); // 사용자 정보를 user 상태에 저장
+      setUser(response.data);
     } catch (error) {
       console.error('Failed to fetch user data:', error);
+      setUser(null); // 사용자 정보 가져오기 실패 시 user를 null로 설정
     } finally {
       setLoading(false);
     }
   };
 
   const logout = () => {
+    sessionStorage.removeItem('token');
     localStorage.removeItem('token');
     setToken(null);
     setUser(null);
@@ -60,6 +63,7 @@ export const AuthProvider = ({ children }) => {
     if (token) {
       fetchUserData(token);
     } else {
+      setUser(null); // 토큰이 없을 때 user를 명시적으로 null로 설정
       setLoading(false);
     }
   }, [token]);
