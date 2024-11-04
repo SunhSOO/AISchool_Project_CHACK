@@ -1,13 +1,36 @@
-import React from 'react';
+// src/pages/ShoppingPage.jsx
+import React, { useEffect, useState } from 'react';
 import { Box, VStack, IconButton, Text, HStack } from '@chakra-ui/react';
 import { ShoppingCart } from 'lucide-react';
 import MainImage from '../components/MainImage';
 import Categories from '../components/Categories';
 import ProductGrid from '../components/ProductGrid';
 import { useCart } from '../components/CartContext';
+import axios from 'axios';
 
 const ShoppingPage = () => {
   const { cartItems } = useCart();
+  const [products, setProducts] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('All'); // 선택된 카테고리 상태 추가
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/clothes/');
+        setProducts(response.data.clothes); // Assuming response.data.clothes is an array of product objects
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  // 선택된 카테고리에 따라 필터링된 제품 목록
+  const filteredProducts =
+    selectedCategory === 'All'
+      ? products
+      : products.filter((product) => product.clo_desc === selectedCategory);
 
   return (
     <Box
@@ -37,8 +60,12 @@ const ShoppingPage = () => {
       </HStack>
       <VStack spacing={4} align="stretch" flexGrow={1}>
         <MainImage />
-        <Categories />
-        <ProductGrid />
+        <Categories
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+        />
+        <ProductGrid products={filteredProducts} />{' '}
+        {/* Filtered products passed to ProductGrid */}
       </VStack>
     </Box>
   );

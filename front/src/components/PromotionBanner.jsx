@@ -25,31 +25,35 @@ const PromotionBanner = () => {
     swipe: true,
     appendDots: (dots) => (
       <Flex justify="center" mt={2} zIndex="1">
-        {dots} {/* 기존에 제공된 점을 그대로 사용 */}
+        {dots}
       </Flex>
     ),
   };
 
   return (
     <Box
-      p={0} // 내부 여백을 없앰
-      maxW="100%"
+      maxW={{ base: '350px', md: '600px' }} // 작은 화면에서는 350px, 큰 화면에서는 600px로 설정
       mx="auto"
       bg="white"
-      borderRadius="md"
+      borderRadius="3xl"
       boxShadow="sm"
       mt={4}
       mb={7}
     >
       <Slider {...settings}>
         {banners.map((banner) => (
-          <Box key={banner.id}>
+          <Box
+            key={banner.id}
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+          >
             <Image
               src={banner.src}
               alt={banner.alt}
-              objectFit="cover"
-              width="100%"
-              height="100%" // 고정된 높이 설정
+              objectFit="cover" // 이미지 비율을 유지하며 크기를 조정
+              width="100%" // 너비를 100%로 설정
+              height="100%" // 높이를 100%로 설정
               borderRadius="md"
             />
           </Box>

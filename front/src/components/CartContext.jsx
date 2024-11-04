@@ -9,13 +9,19 @@ export const CartProvider = ({ children }) => {
   );
 
   const addToCart = (product) => {
+    // product 객체가 제대로 `clo_idx`를 포함하고 있는지 확인
+    if (!product.clo_idx) {
+      console.error("Product is missing 'clo_idx' property:", product);
+      return;
+    }
+
     const updatedCart = [...cartItems, product];
     setCartItems(updatedCart);
     localStorage.setItem('cartItems', JSON.stringify(updatedCart));
   };
 
-  const removeFromCart = (productId) => {
-    const updatedCart = cartItems.filter((item) => item.id !== productId);
+  const removeFromCart = (productIdx) => {
+    const updatedCart = cartItems.filter((item) => item.clo_idx !== productIdx);
     setCartItems(updatedCart);
     localStorage.setItem('cartItems', JSON.stringify(updatedCart));
   };

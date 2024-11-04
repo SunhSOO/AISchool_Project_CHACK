@@ -16,12 +16,12 @@ const CheckoutPage = () => {
 
   const calculateTotal = () => {
     return cartItems
-      .reduce((total, item) => total + parseFloat(item.price), 0)
-      .toFixed(2);
+      .reduce((total, item) => total + parseFloat(item.clo_price), 0)
+      .toLocaleString(); // 세 자리마다 콤마 추가
   };
 
   const handlePurchase = () => {
-    alert('Payment processed!');
+    alert('결제가 완료되었습니다!');
     setCartItems([]); // 장바구니 비우기
     localStorage.setItem('cartItems', JSON.stringify([])); // localStorage에서도 초기화
     navigate('/userlooks'); // 구매 후 장바구니 페이지로 이동
@@ -38,12 +38,12 @@ const CheckoutPage = () => {
       mt={10}
     >
       <Heading as="h1" size="lg" mb={4} textAlign="center">
-        Checkout
+        결제
       </Heading>
       <VStack spacing={4} align="stretch">
         {cartItems.map((item) => (
           <Box
-            key={item.id}
+            key={item.clo_idx}
             bg="gray.50"
             p={4}
             borderRadius="lg"
@@ -53,16 +53,17 @@ const CheckoutPage = () => {
             alignItems="center"
           >
             <Text fontSize="md" fontWeight="bold">
-              {item.title}
+              {item.clo_name}
             </Text>
             <Text fontSize="md" color="gray.500">
-              ${item.price}
+              ₩{parseInt(item.clo_price).toLocaleString()}{' '}
+              {/* 세 자리마다 콤마 */}
             </Text>
           </Box>
         ))}
         <Box p={4} borderTop="1px" borderColor="gray.200">
           <Text fontSize="lg" fontWeight="bold" textAlign="right">
-            Total: ${calculateTotal()}
+            총합: ₩{calculateTotal()}원
           </Text>
         </Box>
         <Button

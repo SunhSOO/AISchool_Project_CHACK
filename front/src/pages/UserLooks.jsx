@@ -19,17 +19,18 @@ const UserLooks = () => {
   const navigate = useNavigate();
 
   const calculateTotal = () => {
-    return cartItems
-      .reduce((total, item) => total + parseFloat(item.price), 0)
-      .toFixed(2);
+    return cartItems.reduce(
+      (total, item) => total + parseFloat(item.clo_price),
+      0
+    );
   };
 
   const handleCheckout = () => {
     const purchaseData = [...cartItems];
     localStorage.setItem('purchaseHistory', JSON.stringify(purchaseData));
-    localStorage.setItem('cartItems', JSON.stringify([])); // 장바구니 초기화 상태를 localStorage에 저장
-    setCartItems([]); // Context 상태에서도 장바구니를 초기화
-    navigate('/checkout'); // Checkout 페이지로 이동
+    localStorage.setItem('cartItems', JSON.stringify([]));
+    setCartItems([]);
+    navigate('/checkout');
   };
 
   return (
@@ -46,7 +47,7 @@ const UserLooks = () => {
       <VStack spacing={4} align="stretch">
         {cartItems.map((item) => (
           <Flex
-            key={item.id}
+            key={item.clo_idx} // 고유한 값으로 설정
             bg="white"
             boxShadow="md"
             borderRadius="3xl"
@@ -66,25 +67,32 @@ const UserLooks = () => {
                 justifyContent="center"
                 overflow="hidden"
               >
-                <Image src={item.image} alt={item.title} boxSize="100%" />
+                <Image
+                  src={item.clo_img1_url}
+                  alt={item.clo_name}
+                  boxSize="100%"
+                />
               </Box>
               <VStack align="flex-start" spacing={1}>
                 <Text fontSize="lg" fontWeight="bold">
-                  {item.title}
+                  {item.clo_name}
                 </Text>
                 <Text fontSize="md" color="gray.500">
-                  ${item.price}
+                  ₩{item.clo_price}
                 </Text>
               </VStack>
             </HStack>
             <IconButton
               icon={<DeleteIcon />}
-              aria-label="Remove from cart"
+              aria-label="장바구니에서 제거"
               size="lg"
               borderRadius="full"
               bg="red.100"
               _hover={{ bg: 'red.200' }}
-              onClick={() => removeFromCart(item.id)}
+              onClick={() => {
+                console.log(`Removing item with clo_idx: ${item.clo_idx}`);
+                removeFromCart(item.clo_idx); // 아이템 고유 ID 전달
+              }}
             />
           </Flex>
         ))}
@@ -92,10 +100,10 @@ const UserLooks = () => {
           <Box p={4} borderTop="1px" borderColor="gray.200">
             <HStack justify="space-between">
               <Text fontSize="lg" fontWeight="bold">
-                Total:
+                총합:
               </Text>
               <Text fontSize="lg" fontWeight="bold">
-                ${calculateTotal()}
+                ₩{parseInt(calculateTotal()).toLocaleString()}원
               </Text>
             </HStack>
             <Button
@@ -105,13 +113,13 @@ const UserLooks = () => {
               mt={4}
               onClick={handleCheckout}
             >
-              Checkout
+              결제
             </Button>
           </Box>
         )}
         {cartItems.length === 0 && (
           <Text textAlign="center" color="gray.500" py={8}>
-            Your cart is empty
+            장바구니가 비어 있습니다
           </Text>
         )}
       </VStack>

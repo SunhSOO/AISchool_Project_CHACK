@@ -25,9 +25,19 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 logger = logging.getLogger(__name__)  
 
 @router.get("/", response_model=ClothesListSchema, summary="모든 옷 목록 조회", description="모든 옷의 정보를 조회합니다.")
-async def get_clothes(repository: ClothesRepository = Depends()):  # 수정: async로 변경
+async def get_clothes(request: Request, repository: ClothesRepository = Depends()):
     clothes = repository.get_clothes()
-    return ClothesListSchema(clothes=[ClothesSchema.model_validate(clothe) for clothe in clothes])
+    base_url = str(request.base_url)
+    clothes_list = []
+    for clothe in clothes:
+        clothes_schema = ClothesSchema.model_validate(clothe)
+        if clothe.clo_img1:
+            clo_img1_basename = os.path.basename(clothe.clo_img1)
+            clothes_schema.clo_img1_url = f"{base_url}files/clothes/{clo_img1_basename}"
+        else:
+            clothes_schema.clo_img1_url = None
+        clothes_list.append(clothes_schema)
+    return ClothesListSchema(clothes=clothes_list)
 
 @router.get("/{clo_idx}", response_model=ClothesSchema, summary="특정 옷 정보 조회", description="특정 옷의 상세 정보를 조회합니다.")
 async def get_clothes_item(clo_idx: int, request: Request, repository: ClothesRepository = Depends()):  # 수정: async 및 Request 추가

@@ -26,7 +26,7 @@ import { MdAccountCircle } from 'react-icons/md';
 import { useAuth } from '../components/AuthContext';
 
 const MyPage = () => {
-  const { user, logout } = useAuth(); // loading 제거
+  const { user, logout } = useAuth();
   const {
     isOpen: isEditOpen,
     onOpen: onEditOpen,
@@ -73,7 +73,7 @@ const MyPage = () => {
       height="100vh"
     >
       <Text fontSize="4xl" fontWeight="bold" mb={2}>
-        Profile
+        프로필
       </Text>
 
       <Box
@@ -90,7 +90,7 @@ const MyPage = () => {
           <Heading as="h2" size="md" color="white">
             {user?.user_name || 'Guest'}
           </Heading>
-          <Text>{user?.user_email || 'No email available'}</Text>
+          <Text>{user?.user_email || '이메일 정보 없음'}</Text>
         </Box>
         <Button
           ml="auto"
@@ -190,8 +190,8 @@ const MyPage = () => {
               <VStack align="stretch">
                 {purchaseHistory.map((item, index) => (
                   <Box key={index} p={2} borderBottom="1px solid gray">
-                    <Text fontWeight="bold">{item.title}</Text>
-                    <Text>${item.price}</Text>
+                    <Text fontWeight="bold">{item.clo_name}</Text>
+                    <Text>₩{parseInt(item.clo_price).toLocaleString()}원</Text>
                   </Box>
                 ))}
               </VStack>
