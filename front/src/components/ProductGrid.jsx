@@ -35,7 +35,7 @@ const ProductCard = ({ clo_idx, clo_img1_url, clo_name, clo_price }) => {
   };
 
   return (
-    <Box borderWidth="1px" borderRadius="lg" overflow="hidden" bg="white">
+    <Box borderWidth="1px" borderRadius="3xl" overflow="hidden" bg="white">
       <Image
         src={clo_img1_url}
         alt={clo_name}
@@ -51,7 +51,12 @@ const ProductCard = ({ clo_idx, clo_img1_url, clo_name, clo_price }) => {
           <Text fontSize="sm" fontWeight="bold">
             ₩{parseInt(clo_price).toLocaleString()}
           </Text>
-          <Button size="sm" colorScheme="red" onClick={handleAddToCart}>
+          <Button
+            size="sm"
+            colorScheme="red"
+            borderRadius="3xl"
+            onClick={handleAddToCart}
+          >
             장바구니에 추가
           </Button>
         </VStack>

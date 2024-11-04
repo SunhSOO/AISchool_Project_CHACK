@@ -68,11 +68,11 @@ const MainImage = () => {
               >
                 <Box
                   position="relative"
-                  borderRadius="lg"
+                  borderRadius="3xl"
                   overflow="hidden"
                   boxShadow="md"
                   width="100%"
-                  maxWidth={['350px', '600px']}
+                  maxWidth={['345px', '600px']}
                   height="auto"
                   display="flex"
                   justifyContent="center"
@@ -87,6 +87,7 @@ const MainImage = () => {
                     variant="ghost"
                     zIndex="1"
                     aria-label="뒤로 가기"
+                    borderRadius="3xl"
                   />
 
                   <Image

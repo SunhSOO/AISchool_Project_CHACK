@@ -10,26 +10,11 @@ import shirtImage from '../assets/category-shirts.jpg';
 import shoesImage from '../assets/category-shoes.jpg';
 
 const categories = [
-  {
-    name: 'Pants',
-    image: pantsImage,
-  },
-  {
-    name: 'Tops',
-    image: topsImage,
-  },
-  {
-    name: 'Dresses',
-    image: dressesImage,
-  },
-  {
-    name: 'Shirts',
-    image: shirtImage,
-  },
-  {
-    name: 'Shoes',
-    image: shoesImage,
-  },
+  { name: 'Pants', image: pantsImage },
+  { name: 'Tops', image: topsImage },
+  { name: 'Dresses', image: dressesImage },
+  { name: 'Outer', image: shirtImage },
+  { name: 'Shoes', image: shoesImage },
 ];
 
 const CategoryMenu = () => {
@@ -38,7 +23,7 @@ const CategoryMenu = () => {
       p={4}
       bg="white"
       boxShadow="sm"
-      borderRadius="lg"
+      borderRadius="3xl"
       mt={4}
       maxW={{ base: '350px', md: '600px', lg: '800px' }}
       mx="auto"
@@ -54,36 +39,30 @@ const CategoryMenu = () => {
       </Text>
 
       <HStack
-        overflowX="scroll" // 가로 스크롤을 명확하게 설정
+        overflowX="scroll"
         spacing={4}
         bg="white"
-        boxShadow="sm"
-        maxW="full" // 전체 너비로 설정
+        maxW="full"
         mx="auto"
         mb={6}
-        borderRadius="lg"
         justifyContent="start"
         css={{
-          '&::-webkit-scrollbar': {
-            height: '8px',
-          },
+          '&::-webkit-scrollbar': { height: '8px' },
           '&::-webkit-scrollbar-thumb': {
             background: '#888',
             borderRadius: '10px',
           },
-          '&::-webkit-scrollbar-thumb:hover': {
-            background: '#555',
-          },
+          '&::-webkit-scrollbar-thumb:hover': { background: '#555' },
         }}
       >
         {categories.map((category, index) => (
           <Box
             key={index}
             as={RouterLink}
-            to={`/category/${category.name.toLowerCase()}`}
+            to={`/category/${category.name.toLowerCase()}`} // 클릭 시 해당 카테고리 페이지로 이동
             textAlign="center"
             flexShrink="0"
-            minW="fit-content" // 버튼 너비를 fit-content로 설정하여 잘리지 않게 함
+            minW="fit-content"
             display="flex"
             flexDirection="column"
             alignItems="center"
@@ -100,7 +79,7 @@ const CategoryMenu = () => {
                 src={category.image}
                 alt={category.name}
                 boxSize="100px"
-                borderRadius="md"
+                borderRadius="2xl"
                 objectFit="cover"
               />
             </Box>

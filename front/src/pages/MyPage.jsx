@@ -69,16 +69,12 @@ const MyPage = () => {
       p={4}
       bg="white"
       fontFamily="Pretendard"
-      mt={10}
+      mt={12}
       height="100vh"
     >
-      <Text fontSize="4xl" fontWeight="bold" mb={2}>
-        프로필
-      </Text>
-
       <Box
         bg="red.500"
-        borderRadius="2xl"
+        borderRadius="3xl"
         p={4}
         display="flex"
         alignItems="center"
@@ -108,7 +104,7 @@ const MyPage = () => {
           p={4}
           bg="white"
           boxShadow="md"
-          borderRadius="2xl"
+          borderRadius="3xl"
           display="flex"
           alignItems="center"
           onClick={onPurchaseOpen}
@@ -129,7 +125,7 @@ const MyPage = () => {
           p={4}
           bg="white"
           boxShadow="md"
-          borderRadius="2xl"
+          borderRadius="3xl"
           display="flex"
           alignItems="center"
           justifyContent="space-between"

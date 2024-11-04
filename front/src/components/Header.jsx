@@ -10,7 +10,6 @@ import {
   DrawerCloseButton,
   DrawerHeader,
   DrawerBody,
-  DrawerFooter,
   Button,
   useDisclosure,
   VStack,
@@ -76,6 +75,11 @@ const Header = () => {
           color="white"
           aria-label="뒤로 가기"
           onClick={handleBackClick}
+          background="none" // 배경 제거
+          borderRadius="3xl"
+          _hover={{ background: 'none' }} // 호버 시 배경 제거
+          _active={{ background: 'none' }} // 클릭 시 배경 제거
+          _focus={{ boxShadow: 'none' }} // 포커스 시 박스 그림자 제거
         />
 
         <Link
@@ -92,7 +96,7 @@ const Header = () => {
           <Image
             src={logoImage}
             alt="logo"
-            boxSize={['90px', '100px', '110px', '130px']}
+            boxSize={['90px', '100px']}
             objectFit="contain"
             mb={3}
           />
@@ -104,6 +108,7 @@ const Header = () => {
           icon={<HamburgerIcon boxSize={['24px', '28px', '32px']} />}
           color="white"
           aria-label="메뉴 열기"
+          borderRadius="3xl"
           onClick={onOpen}
         />
       </Flex>
@@ -125,6 +130,7 @@ const Header = () => {
               <Button
                 leftIcon={<AddIcon />}
                 w="100%"
+                borderRadius="3xl"
                 onClick={() => {
                   navigate('/MyPage');
                   onClose();
@@ -135,6 +141,7 @@ const Header = () => {
               <Button
                 leftIcon={<RepeatClockIcon />}
                 w="100%"
+                borderRadius="3xl"
                 onClick={() => {
                   navigate('/userlooks');
                   onClose();
@@ -144,12 +151,6 @@ const Header = () => {
               </Button>
             </VStack>
           </DrawerBody>
-
-          <DrawerFooter>
-            <Button variant="outline" mr={3} onClick={onClose}>
-              닫기
-            </Button>
-          </DrawerFooter>
         </DrawerContent>
       </Drawer>
     </>

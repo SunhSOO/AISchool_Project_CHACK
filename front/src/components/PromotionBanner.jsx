@@ -2,9 +2,9 @@
 import React from 'react';
 import Slider from 'react-slick';
 import { Box, Image, Flex } from '@chakra-ui/react';
-import Banner1 from '../assets/banner1.svg';
-import Banner2 from '../assets/banner2.svg';
-import Banner3 from '../assets/banner3.svg';
+import Banner1 from '../assets/banner1.png';
+import Banner2 from '../assets/banner2.png';
+import Banner3 from '../assets/banner3.png';
 
 // 슬라이드할 배너 이미지 배열
 const banners = [

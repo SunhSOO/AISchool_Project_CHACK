@@ -1,16 +1,8 @@
 // src/components/AuthContext.js
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance'; // axiosInstance import
 import { useNavigate } from 'react-router-dom';
-
-const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8000',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  withCredentials: true,
-});
 
 const AuthContext = createContext();
 
@@ -32,8 +24,24 @@ export const AuthProvider = ({ children }) => {
       setToken(accessToken);
 
       await fetchUserData(accessToken);
+      return response.data;
     } catch (error) {
-      console.error('Login failed:', error);
+      let errorMessage = '로그인 중 문제가 발생했습니다.';
+
+      if (error.response) {
+        if (error.response.status === 401) {
+          errorMessage = '아이디 또는 비밀번호가 잘못되었습니다.';
+        } else if (error.response.status === 400) {
+          errorMessage = '입력값을 확인해주세요.';
+        } else if (error.response.status === 404) {
+          errorMessage =
+            '로그인 URL을 찾을 수 없습니다. 서버 설정을 확인하세요.';
+        }
+      } else {
+        errorMessage = '서버에 연결할 수 없습니다.';
+      }
+
+      throw new Error(errorMessage);
     }
   };
 
@@ -45,7 +53,7 @@ export const AuthProvider = ({ children }) => {
       setUser(response.data);
     } catch (error) {
       console.error('Failed to fetch user data:', error);
-      setUser(null); // 사용자 정보 가져오기 실패 시 user를 null로 설정
+      setUser(null);
     } finally {
       setLoading(false);
     }
@@ -63,7 +71,7 @@ export const AuthProvider = ({ children }) => {
     if (token) {
       fetchUserData(token);
     } else {
-      setUser(null); // 토큰이 없을 때 user를 명시적으로 null로 설정
+      setUser(null);
       setLoading(false);
     }
   }, [token]);
@@ -77,6 +85,7 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within an AuthProvider');
+  if (!context)
+    throw new Error('useAuth는 AuthProvider 내부에서만 사용 가능합니다.');
   return context;
 };

@@ -1,4 +1,3 @@
-// src/components/Footer.js
 import React from 'react';
 import { Flex, Button, Box } from '@chakra-ui/react';
 import { Icon } from '@chakra-ui/react';
@@ -42,8 +41,10 @@ const Footer = () => {
         fontSize="xs"
         as={RouterLink}
         to="/home"
-        _hover={{ bg: 'transparent', transform: 'scale(1.1)' }} // 호버 시 배경색 제거, 크기만 커짐
-        transition="transform 0.2s" // 크기 변화 시 애니메이션 부드럽게
+        _hover={{ bg: 'transparent', transform: 'scale(1.1)' }}
+        _focus={{ bg: 'transparent', boxShadow: 'none' }} // 포커스 시 배경색 및 그림자 제거
+        _active={{ bg: 'transparent', boxShadow: 'none' }} // 클릭 시 배경색 및 그림자 제거
+        transition="transform 0.2s"
       >
         <Box {...getIconStyle('/home')}>
           <Icon as={FaHome} boxSize={5} />
@@ -55,8 +56,10 @@ const Footer = () => {
         fontSize="xs"
         as={RouterLink}
         to="/ShoppingPage"
-        _hover={{ bg: 'transparent', transform: 'scale(1.1)' }} // 호버 시 배경색 제거, 크기만 커짐
-        transition="transform 0.2s" // 크기 변화 시 애니메이션 부드럽게
+        _hover={{ bg: 'transparent', transform: 'scale(1.1)' }}
+        _focus={{ bg: 'transparent', boxShadow: 'none' }}
+        _active={{ bg: 'transparent', boxShadow: 'none' }}
+        transition="transform 0.2s"
       >
         <Box {...getIconStyle('/ShoppingPage')}>
           <Icon as={IoGridOutline} boxSize={5} />
@@ -68,8 +71,10 @@ const Footer = () => {
         fontSize="xs"
         as={RouterLink}
         to="/UserLooks"
-        _hover={{ bg: 'transparent', transform: 'scale(1.1)' }} // 호버 시 배경색 제거, 크기만 커짐
-        transition="transform 0.2s" // 크기 변화 시 애니메이션 부드럽게
+        _hover={{ bg: 'transparent', transform: 'scale(1.1)' }}
+        _focus={{ bg: 'transparent', boxShadow: 'none' }}
+        _active={{ bg: 'transparent', boxShadow: 'none' }}
+        transition="transform 0.2s"
       >
         <Box {...getIconStyle('/UserLooks')}>
           <Icon as={FaHeart} boxSize={5} />
@@ -81,8 +86,10 @@ const Footer = () => {
         fontSize="xs"
         as={RouterLink}
         to="/mypage"
-        _hover={{ bg: 'transparent', transform: 'scale(1.1)' }} // 호버 시 배경색 제거, 크기만 커짐
-        transition="transform 0.2s" // 크기 변화 시 애니메이션 부드럽게
+        _hover={{ bg: 'transparent', transform: 'scale(1.1)' }}
+        _focus={{ bg: 'transparent', boxShadow: 'none' }}
+        _active={{ bg: 'transparent', boxShadow: 'none' }}
+        transition="transform 0.2s"
       >
         <Box {...getIconStyle('/mypage')}>
           <Icon as={FaUser} boxSize={5} />

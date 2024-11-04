@@ -28,11 +28,10 @@ const Login = () => {
   const toast = useToast();
   const navigate = useNavigate();
 
-  // 이미 로그인되어 있는지 확인
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      navigate('/home'); // 이미 로그인된 경우 홈으로 이동
+      navigate('/home');
     }
   }, [navigate]);
 
@@ -41,12 +40,8 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const loginData = {
-        user_id: userId,
-        password: password,
-      };
-
-      await login(loginData); // AuthContext의 login 함수 호출
+      const loginData = { user_id: userId, password: password };
+      await login(loginData);
 
       toast({
         title: '로그인 성공!',
@@ -58,24 +53,9 @@ const Login = () => {
 
       navigate('/home');
     } catch (error) {
-      console.error('Login error:', error);
-
-      let errorMessage = '로그인 중 문제가 발생했습니다.';
-      if (error.response) {
-        errorMessage = error.response.data?.detail || errorMessage;
-
-        if (error.response.status === 401) {
-          errorMessage = '아이디 또는 비밀번호가 올바르지 않습니다.';
-        } else if (error.response.status === 400) {
-          errorMessage = '입력값을 확인해주세요.';
-        }
-      } else if (error.request) {
-        errorMessage = '서버에 연결할 수 없습니다.';
-      }
-
       toast({
         title: '로그인 실패',
-        description: errorMessage,
+        description: error.message, // AuthContext에서 전달된 오류 메시지를 표시
         status: 'error',
         duration: 3000,
         isClosable: true,
