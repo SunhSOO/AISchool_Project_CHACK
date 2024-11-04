@@ -24,16 +24,18 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 
 # CORS 설정
+# 수정 후
 origins_str = os.getenv("ALLOWED_ORIGINS", "")
 origins = origins_str.split(",") if origins_str else []
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://192.168.21.16:3000"],  # 모바일 접근을 위한 IP 추가
+    allow_origins=origins,  # origins 변수 사용
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 app.include_router(clothes.router)
 app.include_router(user.router)
@@ -54,3 +56,4 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         status_code=exc.status_code,
         content={"detail": exc.detail},
     )
+
