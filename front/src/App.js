@@ -21,7 +21,7 @@ import UserLooks from './pages/UserLooks';
 import SignupComponent from './pages/SignupComponent';
 import MyPage from './pages/MyPage';
 import LooksGallery from './pages/LooksGallery';
-import Avatar from './pages/Avater';
+import Avatar from './pages/Avatar';
 import MeasurementForm from './components/MeasurementForm';
 import Login from './pages/Login';
 import CheckoutPage from './pages/CheckoutPage';

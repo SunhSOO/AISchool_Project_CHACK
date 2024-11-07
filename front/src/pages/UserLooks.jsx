@@ -1,4 +1,3 @@
-// UserLooks.jsx
 import React from 'react';
 import {
   Box,
@@ -15,12 +14,12 @@ import { useCart } from '../components/CartContext';
 import { useNavigate } from 'react-router-dom';
 
 const UserLooks = () => {
-  const { cartItems, removeFromCart, setCartItems } = useCart();
+  const { cartItems, removeFromCart, setCartItems, updateQuantity } = useCart();
   const navigate = useNavigate();
 
   const calculateTotal = () => {
     return cartItems.reduce(
-      (total, item) => total + parseFloat(item.clo_price),
+      (total, item) => total + item.clo_price * (item.quantity || 1),
       0
     );
   };
@@ -47,7 +46,7 @@ const UserLooks = () => {
       <VStack spacing={4} align="stretch">
         {cartItems.map((item) => (
           <Flex
-            key={item.clo_idx} // 고유한 값으로 설정
+            key={item.clo_idx}
             bg="white"
             boxShadow="md"
             borderRadius="3xl"
@@ -78,8 +77,24 @@ const UserLooks = () => {
                   {item.clo_name}
                 </Text>
                 <Text fontSize="md" color="gray.500">
-                  ₩{item.clo_price}
+                  ₩{parseInt(item.clo_price).toLocaleString()}
                 </Text>
+                <HStack>
+                  <Button
+                    size="sm"
+                    onClick={() => updateQuantity(item.clo_idx, -1)}
+                    isDisabled={item.quantity === 1}
+                  >
+                    -
+                  </Button>
+                  <Text>{item.quantity}</Text>
+                  <Button
+                    size="sm"
+                    onClick={() => updateQuantity(item.clo_idx, 1)}
+                  >
+                    +
+                  </Button>
+                </HStack>
               </VStack>
             </HStack>
             <IconButton
@@ -89,10 +104,7 @@ const UserLooks = () => {
               borderRadius="full"
               bg="red.100"
               _hover={{ bg: 'red.200' }}
-              onClick={() => {
-                console.log(`Removing item with clo_idx: ${item.clo_idx}`);
-                removeFromCart(item.clo_idx); // 아이템 고유 ID 전달
-              }}
+              onClick={() => removeFromCart(item.clo_idx)}
             />
           </Flex>
         ))}

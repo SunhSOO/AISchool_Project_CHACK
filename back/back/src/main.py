@@ -4,6 +4,7 @@ import logging
 from fastapi import FastAPI, Request, HTTPException  # HTTPException 추가
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles  # StaticFiles import
 from api import clothes, user, avatar, fitting, files
 from dotenv import load_dotenv
 import os
@@ -22,6 +23,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
+
+# 정적 파일 서빙 설정
+app.mount("/models", StaticFiles(directory="uploads/avatars/models"), name="models")
 
 # CORS 설정
 origins_str = os.getenv("ALLOWED_ORIGINS", "")

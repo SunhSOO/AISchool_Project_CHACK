@@ -1,4 +1,3 @@
-// CartContext.jsx
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 const CartContext = createContext();
@@ -9,19 +8,43 @@ export const CartProvider = ({ children }) => {
   );
 
   const addToCart = (product) => {
-    // product 객체가 제대로 `clo_idx`를 포함하고 있는지 확인
-    if (!product.clo_idx) {
-      console.error("Product is missing 'clo_idx' property:", product);
+    if (!product.clo_idx || !product.clo_price) {
+      console.error('Product is missing required properties:', product);
       return;
     }
 
-    const updatedCart = [...cartItems, product];
+    const existingProductIndex = cartItems.findIndex(
+      (item) => item.clo_idx === product.clo_idx
+    );
+
+    let updatedCart;
+
+    if (existingProductIndex !== -1) {
+      updatedCart = cartItems.map((item, index) =>
+        index === existingProductIndex
+          ? { ...item, quantity: (item.quantity || 1) + 1 }
+          : item
+      );
+    } else {
+      updatedCart = [...cartItems, { ...product, quantity: 1 }];
+    }
+
     setCartItems(updatedCart);
     localStorage.setItem('cartItems', JSON.stringify(updatedCart));
   };
 
   const removeFromCart = (productIdx) => {
     const updatedCart = cartItems.filter((item) => item.clo_idx !== productIdx);
+    setCartItems(updatedCart);
+    localStorage.setItem('cartItems', JSON.stringify(updatedCart));
+  };
+
+  const updateQuantity = (productIdx, delta) => {
+    const updatedCart = cartItems.map((item) =>
+      item.clo_idx === productIdx
+        ? { ...item, quantity: Math.max((item.quantity || 1) + delta, 1) }
+        : item
+    );
     setCartItems(updatedCart);
     localStorage.setItem('cartItems', JSON.stringify(updatedCart));
   };
@@ -33,7 +56,13 @@ export const CartProvider = ({ children }) => {
 
   return (
     <CartContext.Provider
-      value={{ cartItems, addToCart, removeFromCart, setCartItems }}
+      value={{
+        cartItems,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        setCartItems,
+      }}
     >
       {children}
     </CartContext.Provider>
