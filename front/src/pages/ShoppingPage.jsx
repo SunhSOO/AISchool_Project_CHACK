@@ -13,7 +13,7 @@ const ShoppingPage = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://192.168.20.96:8000/clothes/');
+        const response = await axios.get('http://192.168.21.54:8000/clothes/');
         setProducts(response.data.clothes);
       } catch (error) {
         console.error('Failed to fetch products:', error);

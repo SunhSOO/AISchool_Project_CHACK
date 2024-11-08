@@ -51,7 +51,7 @@ const SignupComponent = () => {
     try {
       // FastAPI 백엔드로 회원가입 요청 보내기
       const response = await axios.post(
-        'http://192.168.21.16:8000/users/sign-up',
+        'http://192.168.21.54:8000/users/sign-up',
         {
           user_id: userId, // 아이디 추가
           user_name: username, // FastAPI에서 기대하는 필드 이름과 일치
