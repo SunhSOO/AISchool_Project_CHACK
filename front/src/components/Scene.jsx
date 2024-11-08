@@ -1,19 +1,62 @@
-// src/components/Scene.jsx
-
 import React from 'react';
 import AvatarModel from './AvatarModel';
 import { Environment } from '@react-three/drei';
 
-/**
- * Scene 컴포넌트는 3D 씬을 구성하며 아바타와 티셔츠 모델을 포함합니다.
- *
- * Props:
- * - scale: 아바타와 티셔츠의 기본 스케일
- */
-const Scene = ({ scale = 1 }) => {
+const Scene = ({
+  showAvatar,
+  showClothing,
+  showPants,
+  showShortPants,
+  showShirt,
+  showSkirt,
+}) => {
+  const MODEL_URL = `${process.env.REACT_APP_API_URL}${process.env.REACT_APP_MODEL_PATH}`;
+
+  const MODEL_FILES = {
+    body: {
+      obj: 'body_apose.obj',
+      mtl: 'body_A_pose.mtl',
+    },
+    tshirt: {
+      obj: 't-shirt_apose.obj',
+    },
+    pants: {
+      obj: 'pant_apose.obj',
+    },
+    shortPants: {
+      obj: 'short-pant_apose.obj',
+    },
+    shirt: {
+      obj: 'shirt_apose.obj',
+    },
+    skirt: {
+      obj: 'skirt_apose.obj',
+    },
+  };
+
+  console.log('Scene loading models:', {
+    modelPaths: {
+      bodyObj: `${MODEL_URL}/${MODEL_FILES.body.obj}`,
+      bodyMtl: `${MODEL_URL}/${MODEL_FILES.body.mtl}`,
+      tshirt: `${MODEL_URL}/${MODEL_FILES.tshirt.obj}`,
+      pants: `${MODEL_URL}/${MODEL_FILES.pants.obj}`,
+      shortPants: `${MODEL_URL}/${MODEL_FILES.shortPants.obj}`,
+      shirt: `${MODEL_URL}/${MODEL_FILES.shirt.obj}`,
+      skirt: `${MODEL_URL}/${MODEL_FILES.skirt.obj}`,
+    },
+    visibility: {
+      showAvatar,
+      showClothing,
+      showPants,
+      showShortPants,
+      showShirt,
+      showSkirt,
+    },
+  });
+
   return (
     <>
-      {/* 기본 조명 설정 */}
+      {/* 그림자 제거를 위해 모든 라이트에서 그림자 속성 제거 */}
       <ambientLight intensity={0.5} />
       <directionalLight position={[5, 5, 5]} intensity={0.8} />
       <spotLight
@@ -22,38 +65,55 @@ const Scene = ({ scale = 1 }) => {
         angle={0.3}
         penumbra={1}
       />
-
-      {/* 환경 설정 */}
       <Environment preset="studio" />
-
-      {/* 아바타 모델 */}
+      {/* Avatar Model */}
       <AvatarModel
-        modelUrl="http://192.168.21.54:8000/models/body_apose.obj"
-        textureUrl={null} // 아바타에는 텍스처 사용 안 함
-        isShirt={false}
-        scale={scale}
-        position={[0, 0, 0]} // 화면 중앙에 위치
+        modelUrl={`${MODEL_URL}/${MODEL_FILES.body.obj}`}
+        mtlUrl={`${MODEL_URL}/${MODEL_FILES.body.mtl}`}
+        textureUrl={null}
+        showClothing={showAvatar}
+        modelType="body"
       />
-
-      {/* 티셔츠 모델 */}
+      {/* T-Shirt Model */}
       <AvatarModel
-        modelUrl="http://192.168.21.54:8000/models/t-shirt_apose.obj"
-        textureUrl="/textures/t-shirt.png
-" // 티셔츠 텍스처
-        isShirt={true}
-        scale={scale}
-        position={[0, 0, 0]} // AvatarModel에서 위치 조정
+        modelUrl={`${MODEL_URL}/${MODEL_FILES.tshirt.obj}`}
+        textureUrl="/textures/t-shirt.png"
+        showClothing={showClothing}
+        modelType="tshirt"
       />
-
-      {/* 바닥 평면 */}
-      <mesh
-        rotation={[-Math.PI / 2, 0, 0]}
-        position={[0, -1.5, 0]}
-        receiveShadow
-      >
+      {/* Pants Model */}
+      <AvatarModel
+        modelUrl={`${MODEL_URL}/${MODEL_FILES.pants.obj}`}
+        textureUrl="/textures/pants.png"
+        showPants={showPants}
+        modelType="pants"
+      />
+      {/* Short Pants Model */}
+      <AvatarModel
+        modelUrl={`${MODEL_URL}/${MODEL_FILES.shortPants.obj}`}
+        textureUrl="/textures/short-pants.png"
+        showShortPants={showShortPants}
+        modelType="shortPants"
+      />
+      {/* Shirt Model */}
+      <AvatarModel
+        modelUrl={`${MODEL_URL}/${MODEL_FILES.shirt.obj}`}
+        textureUrl="/textures/shirt.png"
+        showShirt={showShirt}
+        modelType="shirt"
+      />
+      {/* Skirt Model */}
+      <AvatarModel
+        modelUrl={`${MODEL_URL}/${MODEL_FILES.skirt.obj}`}
+        textureUrl="/textures/skirt.png"
+        showSkirt={showSkirt}
+        modelType="skirt"
+      />
+      {/* 평면 메쉬 수정: 그림자를 받지 않도록 설정
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.5, 0]}>
         <planeGeometry args={[10, 10]} />
-        <shadowMaterial opacity={0.2} />
-      </mesh>
+        <meshStandardMaterial color="#ffffff" />
+      </mesh> */}
     </>
   );
 };

@@ -1,14 +1,55 @@
-// Avatar.jsx
 import React, { useState } from 'react';
-import { Box, Flex, Button, Input, VStack, Text } from '@chakra-ui/react';
+import { Box, Flex, Button, VStack } from '@chakra-ui/react';
 import AvatarViewer from '../components/AvatarViewer';
 import { useNavigate } from 'react-router-dom';
 
 const Avatar = () => {
   const navigate = useNavigate();
-  const [gender, setGender] = useState('');
-  const [height, setHeight] = useState('');
-  const [weight, setWeight] = useState('');
+  const [showAvatar, setShowAvatar] = useState(true);
+  const [showTshirt, setShowTshirt] = useState(false);
+  const [showPants, setShowPants] = useState(false);
+  const [showShortPants, setShowShortPants] = useState(false);
+  const [showShirt, setShowShirt] = useState(false);
+  const [showSkirt, setShowSkirt] = useState(false);
+
+  const handleItemClick = (itemType) => {
+    console.log('Clicking:', itemType);
+    switch (itemType) {
+      case 'avatar':
+        setShowAvatar(!showAvatar);
+        break;
+      case 'tshirt':
+        setShowTshirt(!showTshirt);
+        // 다른 상의 끄기
+        setShowShirt(false);
+        break;
+      case 'pants':
+        setShowPants(!showPants);
+        // 다른 하의 끄기
+        setShowShortPants(false);
+        setShowSkirt(false);
+        break;
+      case 'shortPants':
+        setShowShortPants(!showShortPants);
+        // 다른 하의 끄기
+        setShowPants(false);
+        setShowSkirt(false);
+        break;
+      case 'shirt':
+        setShowShirt(!showShirt);
+        // 다른 상의 끄기
+        setShowTshirt(false);
+        break;
+      case 'skirt':
+        setShowSkirt(!showSkirt);
+        // 다른 하의 끄기
+        setShowPants(false);
+        setShowShortPants(false);
+        break;
+      default:
+        break;
+    }
+  };
 
   const handleCaptureClick = () => {
     console.log('Capturing...');
@@ -23,7 +64,7 @@ const Avatar = () => {
   };
 
   const handleApplyClick = () => {
-    console.log('Applying settings:', { gender, height, weight });
+    console.log('Applying settings...');
   };
 
   return (
@@ -33,11 +74,15 @@ const Avatar = () => {
       align="center"
       width="100%"
       mt={12}
-      height="150vh"
+      height="100vh"
     >
       <AvatarViewer
-        bodyModelUrl="test_body"
-        clothingModelUrl="test_clo"
+        showAvatar={showAvatar}
+        showClothing={showTshirt}
+        showPants={showPants}
+        showShortPants={showShortPants}
+        showShirt={showShirt}
+        showSkirt={showSkirt}
         onCaptureClick={handleCaptureClick}
         onGuideClick={handleGuideClick}
         onRetakeClick={handleRetakeClick}
@@ -53,57 +98,85 @@ const Avatar = () => {
         bg="white"
         mt={4}
       >
-        <Flex justifyContent="space-between" width="100%">
-          <Button
-            flex="1"
-            variant={gender === 'male' ? 'solid' : 'outline'}
-            colorScheme={gender === 'male' ? 'blue' : 'gray'}
-            onClick={() => setGender('male')}
-            mr={2}
-          >
-            MALE
-          </Button>
-          <Button
-            flex="1"
-            variant={gender === 'female' ? 'solid' : 'outline'}
-            colorScheme={gender === 'female' ? 'pink' : 'gray'}
-            onClick={() => setGender('female')}
-            ml={2}
-          >
-            FEMALE
-          </Button>
-        </Flex>
-
         <Box width="100%">
-          <Text fontWeight="bold" mb={1}>
-            Height
-          </Text>
-          <Input
-            placeholder="Enter your height (cm)"
-            value={height}
-            onChange={(e) => setHeight(e.target.value)}
-            bg="gray.100"
-            borderRadius="md"
-            mb={2}
-          />
-          <Text fontWeight="bold" mb={1}>
-            Weight
-          </Text>
-          <Input
-            placeholder="Enter your weight (kg)"
-            value={weight}
-            onChange={(e) => setWeight(e.target.value)}
-            bg="gray.100"
-            borderRadius="md"
-          />
+          <Button
+            width="100%"
+            colorScheme="red"
+            size="lg"
+            onClick={() => handleItemClick('avatar')}
+            variant={showAvatar ? 'solid' : 'outline'}
+            mb={4}
+          >
+            Avatar
+          </Button>
+
+          {/* 상의 컨트롤 */}
+          <Flex justifyContent="space-between" gap={4} mb={4}>
+            <Button
+              flex="1"
+              colorScheme="red"
+              size="lg"
+              onClick={() => handleItemClick('tshirt')}
+              variant={showTshirt ? 'solid' : 'outline'}
+            >
+              T-Shirt
+            </Button>
+            <Button
+              flex="1"
+              colorScheme="red"
+              size="lg"
+              onClick={() => handleItemClick('shirt')}
+              variant={showShirt ? 'solid' : 'outline'}
+            >
+              Shirt
+            </Button>
+          </Flex>
+
+          {/* 하의 컨트롤 */}
+          <Flex justifyContent="space-between" gap={4} mb={4}>
+            <Button
+              flex="1"
+              colorScheme="red"
+              size="lg"
+              onClick={() => handleItemClick('pants')}
+              variant={showPants ? 'solid' : 'outline'}
+            >
+              Pants
+            </Button>
+            <Button
+              flex="1"
+              colorScheme="red"
+              size="lg"
+              onClick={() => handleItemClick('shortPants')}
+              variant={showShortPants ? 'solid' : 'outline'}
+            >
+              Short Pants
+            </Button>
+            <Button
+              flex="1"
+              colorScheme="red"
+              size="lg"
+              onClick={() => handleItemClick('skirt')}
+              variant={showSkirt ? 'solid' : 'outline'}
+            >
+              Skirt
+            </Button>
+          </Flex>
         </Box>
 
-        <Button colorScheme="teal" size="md" onClick={handleApplyClick}>
+        <Button
+          colorScheme="red"
+          size="lg"
+          width="100%"
+          onClick={handleApplyClick}
+        >
           Apply
         </Button>
+
         <Button
-          colorScheme="teal"
-          size="md"
+          colorScheme="red"
+          size="lg"
+          width="100%"
           onClick={() => navigate('/measurement-form')}
         >
           Submit

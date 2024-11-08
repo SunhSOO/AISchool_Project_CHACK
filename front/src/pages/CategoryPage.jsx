@@ -15,7 +15,8 @@ const CategoryPage = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://192.168.21.54:8000/clothes/');
+        const API_URL = process.env.REACT_APP_API_URL;
+        const response = await axios.get(`${API_URL}/clothes/`);
         setProducts(response.data.clothes);
       } catch (error) {
         console.error('Failed to fetch products:', error);
