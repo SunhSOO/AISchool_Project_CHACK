@@ -8,11 +8,14 @@ import {
   VStack,
   useToast,
 } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 
 const CameraUpload = () => {
+  const navigate = useNavigate();
   const [capturedImage, setCapturedImage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isUploaded, setIsUploaded] = useState(false);
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const toast = useToast();
@@ -81,6 +84,7 @@ const CameraUpload = () => {
       }
 
       const data = await response.json();
+      setIsUploaded(true);
       toast({
         title: '업로드 성공',
         description: '이미지가 성공적으로 업로드되었습니다.',
@@ -100,6 +104,10 @@ const CameraUpload = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleConfirm = () => {
+    navigate('/avatar');
   };
 
   return (
@@ -148,7 +156,7 @@ const CameraUpload = () => {
                 colorScheme="green"
                 isDisabled={!videoRef.current || isLoading}
               >
-                업로드
+                촬영하기
               </Button>
             </>
           ) : (
@@ -169,6 +177,20 @@ const CameraUpload = () => {
           <Box textAlign="center" color="gray.600">
             처리중...
           </Box>
+        )}
+
+        {/* 확인 버튼 추가 */}
+        {capturedImage && !isLoading && (
+          <Button
+            onClick={handleConfirm}
+            colorScheme="red"
+            size="lg"
+            width="100%"
+            maxW="md"
+            mt={4}
+          >
+            확인
+          </Button>
         )}
       </VStack>
     </Box>
