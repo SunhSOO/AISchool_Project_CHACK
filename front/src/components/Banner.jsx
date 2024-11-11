@@ -10,7 +10,7 @@ const StartComponent = () => {
       boxShadow="md"
       borderRadius="3xl"
       p={6}
-      maxW={{ base: '350px', md: '600px' }} // 작은 화면에서는 350px, 큰 화면에서는 600px
+      maxW={{ base: '350px', md: '600px' }}
       display="flex"
       alignItems="center"
       mt={4}
@@ -22,9 +22,8 @@ const StartComponent = () => {
         align="center"
         textAlign="left"
         w="100%"
-        ml={{ base: 0, md: 12 }} // 모바일에서는 0, 웹에서는 24의 왼쪽 마진
+        ml={{ base: 0, md: 12 }}
       >
-        {/* 왼쪽 텍스트와 버튼 */}
         <Box flex="1">
           <Text
             fontFamily={'Pretendard'}
@@ -40,7 +39,7 @@ const StartComponent = () => {
           <Button
             fontFamily={'Pretendard'}
             as={RouterLink}
-            to="/avatar"
+            to="/camera-upload" // 변경된 부분
             colorScheme="blackAlpha"
             variant="outline"
             size="sm"
@@ -50,7 +49,6 @@ const StartComponent = () => {
           </Button>
         </Box>
 
-        {/* 오른쪽 이미지 */}
         <Box
           flex="1"
           display="flex"
@@ -62,10 +60,10 @@ const StartComponent = () => {
             src={lobotImage}
             alt="Chack 시작"
             borderRadius="lg"
-            width="90%" // 너비를 90%로 설정
-            height="100%" // 높이를 100%로 고정
-            maxH="400px" // 최대 높이를 설정 (필요에 따라 조정 가능)
-            objectFit="cover" // 비율 유지하며 크기 조정
+            width="90%"
+            height="100%"
+            maxH="400px"
+            objectFit="cover"
           />
         </Box>
       </Flex>

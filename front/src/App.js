@@ -5,7 +5,7 @@ import {
   Routes,
   useLocation,
 } from 'react-router-dom';
-import './App.css'; // app.css 파일 불러오기
+import './App.css';
 import { ChakraProvider, Box } from '@chakra-ui/react';
 import { CartProvider } from '../src/components/CartContext';
 import { AuthProvider } from './components/AuthContext';
@@ -25,6 +25,7 @@ import Avatar from './pages/Avatar';
 import MeasurementForm from './components/MeasurementForm';
 import Login from './pages/Login';
 import CheckoutPage from './pages/CheckoutPage';
+import CameraUpload from './components/CameraUpload';
 
 const AppLayout = ({ children }) => {
   const location = useLocation();
@@ -33,7 +34,7 @@ const AppLayout = ({ children }) => {
     location.pathname === '/' ||
     location.pathname === '/agreement' ||
     location.pathname === '/signup' ||
-    location.pathname === '/login';
+    location.pathname === '/login'; // camera-upload 제거됨
 
   return (
     <>
@@ -45,6 +46,7 @@ const AppLayout = ({ children }) => {
         maxW="600px"
         width="100%"
         mx="auto"
+        bg={location.pathname === '/camera-upload' ? 'gray.100' : 'white'} // 배경색 조정
       >
         {children}
       </Box>
@@ -58,28 +60,40 @@ const App = () => {
     <ChakraProvider>
       <Router>
         <AuthProvider>
-          {' '}
-          {/* AuthProvider를 Router 내부로 이동 */}
           <CartProvider>
             <AppLayout>
               <Routes>
+                {/* 인증 관련 라우트 */}
                 <Route path="/" element={<LoginPage />} />
                 <Route path="/agreement" element={<AgreementPage />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<SignupComponent />} />
+
+                {/* 메인 페이지 라우트 */}
                 <Route path="/home" element={<Home />} />
+
+                {/* 카메라 및 아바타 관련 라우트 */}
+                <Route path="/camera-upload" element={<CameraUpload />} />
+                <Route path="/avatar" element={<Avatar />} />
+                <Route path="/measurement-form" element={<MeasurementForm />} />
+
+                {/* 쇼핑 관련 라우트 */}
                 <Route path="/ShoppingPage" element={<ShoppingPage />} />
                 <Route
                   path="/category/:categoryName"
                   element={<CategoryPage />}
                 />
-                <Route path="/UserLooks" element={<UserLooks />} />
-                <Route path="/signup" element={<SignupComponent />} />
-                <Route path="*" element={<NotFound />} />
-                <Route path="/looksgallery" element={<LooksGallery />} />
-                <Route path="/mypage" element={<MyPage />} />
-                <Route path="/avatar" element={<Avatar />} />
-                <Route path="/measurement-form" element={<MeasurementForm />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
+
+                {/* 사용자 스타일 관련 라우트 */}
+                <Route path="/UserLooks" element={<UserLooks />} />
+                <Route path="/looksgallery" element={<LooksGallery />} />
+
+                {/* 사용자 설정 라우트 */}
+                <Route path="/mypage" element={<MyPage />} />
+
+                {/* 404 페이지 */}
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </AppLayout>
           </CartProvider>
