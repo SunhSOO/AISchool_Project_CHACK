@@ -74,6 +74,7 @@ const Avatar = () => {
       align="center"
       width="100%"
       mt={12}
+      mb={12}
       height="100vh"
     >
       <AvatarViewer
@@ -173,14 +174,14 @@ const Avatar = () => {
           Apply
         </Button>
 
-        <Button
+        {/* <Button
           colorScheme="red"
           size="lg"
           width="100%"
           onClick={() => navigate('/measurement-form')}
         >
           Submit
-        </Button>
+        </Button> */}
       </VStack>
     </Flex>
   );

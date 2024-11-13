@@ -1,18 +1,10 @@
 // src/pages/LoginPage.js
 import React from 'react';
-import {
-  Box,
-  Button,
-  Text,
-  Image,
-  VStack,
-  Link,
-  Flex,
-  keyframes,
-} from '@chakra-ui/react';
+import { Box, Button, Text, Image, VStack, Link, Flex } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import loginBackground from '../assets/loginback.jpg'; // 배경 이미지 불러오기
 import logoImage from '../assets/logo.png'; // 로고 이미지 불러오기
+import { keyframes } from '@emotion/react'; // emotion의 keyframes만 사용
 
 // 배경 이미지를 X축과 Y축으로 부드럽게 이동시키는 keyframes 정의
 const moveBackground = keyframes`
