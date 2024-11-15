@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Image, Box, Flex, Button, Icon, IconButton } from '@chakra-ui/react';
 import { FiCamera } from 'react-icons/fi'; // 카메라 아이콘 불러오기
 import { ArrowBackIcon } from '@chakra-ui/icons'; // 뒤로 가기 아이콘 불러오기

@@ -55,7 +55,7 @@ const Footer = () => {
         flexDirection="column"
         fontSize="xs"
         as={RouterLink}
-        to="/ShoppingPage"
+        to="/shopping"
         _hover={{ bg: 'transparent', transform: 'scale(1.1)' }}
         _focus={{ bg: 'transparent', boxShadow: 'none' }}
         _active={{ bg: 'transparent', boxShadow: 'none' }}

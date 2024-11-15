@@ -1,72 +1,88 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
-import { IconButton, Box, useDisclosure, Flex } from '@chakra-ui/react';
-import { FaCamera, FaRedo, FaBook } from 'react-icons/fa';
+import { Box, Text, Flex, Spinner } from '@chakra-ui/react';
 import Scene from './Scene';
-import CaptureGuide from './CaptureGuide';
 import Loader from './Loader';
+import { useClothing } from '../contexts/ClothingContext';
+import { getAvatarData } from '../services/api';
 
-const AvatarViewer = ({
-  showAvatar = true,
-  showClothing = false,
-  showPants = false,
-  showShortPants = false,
-  showShirt = false,
-  showSkirt = false,
-  onCaptureClick = () => console.log('Capture clicked'),
-  onRetakeClick = () => console.log('Retake clicked'),
-  onGuideClick = () => console.log('Guide clicked'),
-}) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+const AvatarViewer = () => {
+  const { activeClothing, updateClothing } = useClothing();
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  console.log('AvatarViewer rendering with:', {
-    showAvatar,
-    showClothing,
-    showPants,
-    showShortPants,
-    showShirt,
-    showSkirt,
-  });
+  useEffect(() => {
+    const loadAvatarData = async () => {
+      try {
+        const data = await getAvatarData();
+        console.log('Loaded avatar data:', data);
+
+        updateClothing({
+          avatarIndex: data.avatarIndex,
+          gender: data.gender,
+          clo_3d: data.clo_3d,
+        });
+      } catch (error) {
+        console.error('아바타 로드 실패:', error);
+        setError(error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadAvatarData();
+  }, [updateClothing]);
+
+  if (isLoading) {
+    return (
+      <Flex
+        width="100%"
+        height="100%"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Spinner size="xl" color="blue.500" />
+      </Flex>
+    );
+  }
+
+  if (error) {
+    return (
+      <Flex
+        width="100%"
+        height="100%"
+        justifyContent="center"
+        alignItems="center"
+        color="red.500"
+      >
+        <Text>{error}</Text>
+      </Flex>
+    );
+  }
 
   return (
-    <Box position="relative" width="100%" height="60vh" zIndex={1}>
-      {/* 상단 컨트롤 버튼 */}
-      <Flex
-        position="absolute"
-        top={4}
-        left="50%"
-        transform="translateX(-50%)"
-        zIndex={2}
-        gap={4}
-      >
-        <IconButton
-          icon={<FaCamera />}
-          aria-label="Capture"
-          onClick={onCaptureClick}
-          colorScheme="red"
-          size="lg"
-          borderRadius="full"
-        />
-        <IconButton
-          icon={<FaRedo />}
-          aria-label="Retake"
-          onClick={onRetakeClick}
-          colorScheme="red"
-          size="lg"
-          borderRadius="full"
-        />
-        <IconButton
-          icon={<FaBook />}
-          aria-label="Guide"
-          onClick={onOpen}
-          colorScheme="red"
-          size="lg"
-          borderRadius="full"
-        />
-      </Flex>
+    <Box position="relative" width="100%" height="100%" zIndex={1}>
+      {!activeClothing.clo_3d && (
+        <Flex
+          position="absolute"
+          top="20px"
+          right="20px"
+          zIndex={2}
+          bg="blue.500"
+          color="white"
+          px={4}
+          py={2}
+          borderRadius="md"
+          alignItems="center"
+          boxShadow="lg"
+        >
+          <Text fontSize="sm" fontWeight="medium">
+            아바타를 생성 중입니다...
+          </Text>
+        </Flex>
+      )}
 
-      {/* 3D Canvas */}
       <Canvas
         shadows
         camera={{
@@ -91,25 +107,25 @@ const AvatarViewer = ({
           enableRotate
           minPolarAngle={0}
           maxPolarAngle={Math.PI}
-          minDistance={2}
-          maxDistance={6}
+          minDistance={1.5}
+          maxDistance={4}
           target={[0, 0, 0]}
         />
 
         <Suspense fallback={<Loader />}>
           <Scene
-            showAvatar={showAvatar}
-            showClothing={showClothing}
-            showPants={showPants}
-            showShortPants={showShortPants}
-            showShirt={showShirt}
-            showSkirt={showSkirt}
+            showAvatar={true}
+            showClothing={activeClothing.showClothing}
+            showPants={activeClothing.showPants}
+            showShortPants={activeClothing.showShortPants}
+            showShirt={activeClothing.showShirt}
+            showSkirt={activeClothing.showSkirt}
+            gender={activeClothing.gender}
+            clo_3d={activeClothing.clo_3d}
+            avatarIndex={activeClothing.avatarIndex}
           />
         </Suspense>
       </Canvas>
-
-      {/* 가이드 모달 */}
-      <CaptureGuide isOpen={isOpen} onClose={onClose} />
     </Box>
   );
 };

@@ -1,6 +1,7 @@
+// src/components/Scene.jsx
 import React from 'react';
-import AvatarModel from './AvatarModel';
 import { Environment } from '@react-three/drei';
+import AvatarModel from './AvatarModel';
 
 const Scene = ({
   showAvatar,
@@ -9,111 +10,160 @@ const Scene = ({
   showShortPants,
   showShirt,
   showSkirt,
+  gender = 'female',
+  clo_3d,
+  avatarIndex = '28',
 }) => {
-  const MODEL_URL = `${process.env.REACT_APP_API_URL}${process.env.REACT_APP_MODEL_PATH}`;
+  // 실제 모델 경로
+  const AVATAR_PATH = `${process.env.REACT_APP_API_URL}/uploads/avatars/models`;
+  const CLOTHING_PATH = `${process.env.REACT_APP_API_URL}/uploads/fittings`;
 
-  const MODEL_FILES = {
+  // 실제 모델 파일 구조
+  const REAL_MODEL_FILES = {
     body: {
-      obj: 'body_apose.obj',
-      mtl: 'body_A_pose.mtl',
+      obj: `${AVATAR_PATH}/body_${avatarIndex}_${gender}.obj`,
+      mtl: null,
     },
     tshirt: {
-      obj: 't-shirt_apose.obj',
+      obj: `${CLOTHING_PATH}/garment_${avatarIndex}_${gender}_tshirt.obj`,
     },
     pants: {
-      obj: 'pant_apose.obj',
+      obj: `${CLOTHING_PATH}/garment_${avatarIndex}_${gender}_pants.obj`,
     },
     shortPants: {
-      obj: 'short-pant_apose.obj',
+      obj: `${CLOTHING_PATH}/garment_${avatarIndex}_${gender}_shortpants.obj`,
     },
     shirt: {
-      obj: 'shirt_apose.obj',
+      obj: `${CLOTHING_PATH}/garment_${avatarIndex}_${gender}_shirt.obj`,
     },
-    skirt: {
-      obj: 'skirt_apose.obj',
+    skirt:
+      gender === 'female'
+        ? {
+            obj: `${CLOTHING_PATH}/garment_${avatarIndex}_${gender}_skirt.obj`,
+          }
+        : null,
+  };
+
+  // 테스트 모델 경로
+  const MODEL_URL = `${process.env.REACT_APP_API_URL}${process.env.REACT_APP_MODEL_PATH}`;
+
+  // 테스트 모델 파일 구조
+  const TEST_MODEL_FILES = {
+    female: {
+      body: {
+        obj: `${MODEL_URL}/body_apose.obj`,
+        mtl: `${MODEL_URL}/body_A_pose.mtl`,
+      },
+      tshirt: {
+        obj: `${MODEL_URL}/t-shirt_apose.obj`,
+        texture: '/textures/t-shirt01.png',
+      },
+      pants: {
+        obj: `${MODEL_URL}/pant_apose.obj`,
+        texture: '/textures/pants_texture1.png',
+      },
+      shortPants: {
+        obj: `${MODEL_URL}/short-pant_apose.obj`,
+        texture: '/textures/short-pants_texture1.png',
+      },
+      shirt: {
+        obj: `${MODEL_URL}/shirt_apose.obj`,
+        texture: '/textures/shirt_texture1.png',
+      },
+      skirt: {
+        obj: `${MODEL_URL}/skirt_apose.obj`,
+        texture: '/textures/skirt_texture1.png',
+      },
+    },
+    male: {
+      body: {
+        obj: `${MODEL_URL}/body_0_male_pant.obj`,
+        mtl: null,
+      },
+      tshirt: {
+        obj: `${MODEL_URL}/garment_0_male_t-shirt.obj`,
+        texture: '/textures/m_t-shirt_texture1.png',
+      },
+      pants: {
+        obj: `${MODEL_URL}/garment_0_male_pant.obj`,
+        texture: '/textures/m_pants_texture1.png',
+      },
+      shortPants: {
+        obj: `${MODEL_URL}/garment_0_male_short-pant.obj`,
+        texture: '/textures/m_short-pants_texture1.png',
+      },
+      shirt: {
+        obj: `${MODEL_URL}/garment_0_male_shirt.obj`,
+        texture: '/textures/m_shirt_texture1.png',
+      },
     },
   };
 
-  console.log('Scene loading models:', {
-    modelPaths: {
-      bodyObj: `${MODEL_URL}/${MODEL_FILES.body.obj}`,
-      bodyMtl: `${MODEL_URL}/${MODEL_FILES.body.mtl}`,
-      tshirt: `${MODEL_URL}/${MODEL_FILES.tshirt.obj}`,
-      pants: `${MODEL_URL}/${MODEL_FILES.pants.obj}`,
-      shortPants: `${MODEL_URL}/${MODEL_FILES.shortPants.obj}`,
-      shirt: `${MODEL_URL}/${MODEL_FILES.shirt.obj}`,
-      skirt: `${MODEL_URL}/${MODEL_FILES.skirt.obj}`,
-    },
-    visibility: {
-      showAvatar,
-      showClothing,
-      showPants,
-      showShortPants,
-      showShirt,
-      showSkirt,
-    },
+  const hasRealModel = clo_3d && Object.keys(clo_3d).length > 0;
+  // 현재 사용할 모델 선택
+  const currentModels = hasRealModel ? clo_3d : TEST_MODEL_FILES[gender];
+
+  console.log('Scene rendering:', {
+    hasRealModel,
+    gender,
+    modelType: hasRealModel ? 'Real Model' : 'Test Model',
+    currentModels,
   });
 
   return (
     <>
-      {/* 그림자 제거를 위해 모든 라이트에서 그림자 속성 제거 */}
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[5, 5, 5]} intensity={0.8} />
-      <spotLight
-        position={[-5, 5, 0]}
-        intensity={0.5}
-        angle={0.3}
-        penumbra={1}
-      />
       <Environment preset="studio" />
-      {/* Avatar Model */}
+
+      {/* Avatar Body */}
       <AvatarModel
-        modelUrl={`${MODEL_URL}/${MODEL_FILES.body.obj}`}
-        mtlUrl={`${MODEL_URL}/${MODEL_FILES.body.mtl}`}
+        modelUrl={currentModels.body.obj}
+        mtlUrl={hasRealModel ? null : currentModels.body.mtl}
         textureUrl={null}
         showClothing={showAvatar}
         modelType="body"
       />
-      {/* T-Shirt Model */}
+
+      {/* T-Shirt */}
       <AvatarModel
-        modelUrl={`${MODEL_URL}/${MODEL_FILES.tshirt.obj}`}
-        textureUrl="/textures/t-shirt.png"
+        modelUrl={currentModels.tshirt.obj}
+        textureUrl={hasRealModel ? null : currentModels.tshirt.texture}
         showClothing={showClothing}
         modelType="tshirt"
       />
-      {/* Pants Model */}
+
+      {/* Pants */}
       <AvatarModel
-        modelUrl={`${MODEL_URL}/${MODEL_FILES.pants.obj}`}
-        textureUrl="/textures/pants.png"
+        modelUrl={currentModels.pants.obj}
+        textureUrl={hasRealModel ? null : currentModels.pants.texture}
         showPants={showPants}
         modelType="pants"
       />
-      {/* Short Pants Model */}
+
+      {/* Short Pants */}
       <AvatarModel
-        modelUrl={`${MODEL_URL}/${MODEL_FILES.shortPants.obj}`}
-        textureUrl="/textures/short-pants.png"
+        modelUrl={currentModels.shortPants.obj}
+        textureUrl={hasRealModel ? null : currentModels.shortPants.texture}
         showShortPants={showShortPants}
         modelType="shortPants"
       />
-      {/* Shirt Model */}
+
+      {/* Shirt */}
       <AvatarModel
-        modelUrl={`${MODEL_URL}/${MODEL_FILES.shirt.obj}`}
-        textureUrl="/textures/shirt.png"
+        modelUrl={currentModels.shirt.obj}
+        textureUrl={hasRealModel ? null : currentModels.shirt.texture}
         showShirt={showShirt}
         modelType="shirt"
       />
-      {/* Skirt Model */}
-      <AvatarModel
-        modelUrl={`${MODEL_URL}/${MODEL_FILES.skirt.obj}`}
-        textureUrl="/textures/skirt.png"
-        showSkirt={showSkirt}
-        modelType="skirt"
-      />
-      {/* 평면 메쉬 수정: 그림자를 받지 않도록 설정
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.5, 0]}>
-        <planeGeometry args={[10, 10]} />
-        <meshStandardMaterial color="#ffffff" />
-      </mesh> */}
+
+      {/* Skirt - 여성 모델만 */}
+      {currentModels.skirt && (
+        <AvatarModel
+          modelUrl={currentModels.skirt.obj}
+          textureUrl={hasRealModel ? null : currentModels.skirt?.texture}
+          showSkirt={showSkirt}
+          modelType="skirt"
+        />
+      )}
     </>
   );
 };

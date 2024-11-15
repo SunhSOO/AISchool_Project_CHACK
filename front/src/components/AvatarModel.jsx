@@ -1,3 +1,4 @@
+// src/components/AvatarModel.jsx
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
@@ -46,6 +47,8 @@ const AvatarModel = ({
     async (url, texUrl = null, mtlUrl = null) => {
       if (!url) return null;
 
+      console.log('Loading model:', { url, modelType });
+
       const objLoader = new OBJLoader();
       const mtlLoader = new MTLLoader();
       const textureLoader = new TextureLoader();
@@ -55,35 +58,19 @@ const AvatarModel = ({
         let materials = null;
         if (mtlUrl) {
           try {
-            console.log('Attempting to load MTL:', mtlUrl);
             materials = await new Promise((resolve, reject) => {
               mtlLoader.load(
                 mtlUrl,
                 (loadedMaterials) => {
-                  console.log('MTL loaded successfully');
                   loadedMaterials.preload();
                   resolve(loadedMaterials);
                 },
-                (xhr) => {
-                  console.log(
-                    'MTL loading progress:',
-                    (xhr.loaded / xhr.total) * 100 + '%'
-                  );
-                },
-                (error) => {
-                  console.warn(
-                    'MTL load failed, continuing without materials:',
-                    error
-                  );
-                  resolve(null);
-                }
+                undefined,
+                reject
               );
             });
           } catch (err) {
-            console.warn(
-              'MTL loading error, continuing without materials:',
-              err
-            );
+            console.warn('MTL loading failed:', err);
             materials = null;
           }
         }
@@ -96,54 +83,26 @@ const AvatarModel = ({
           objLoader.load(
             url,
             (loadedObj) => {
-              console.log('Loaded model:', {
-                url: url,
-                type: modelType,
-                hasMaterials: materials ? 'yes' : 'no',
-              });
-
               loadedObj.traverse((child) => {
                 if (child instanceof THREE.Mesh) {
                   if (!child.geometry.attributes.uv) {
-                    console.log('Generating UVs for:', modelType);
                     child.geometry = generateUVs(child.geometry);
                   }
 
                   if (texUrl) {
-                    const texture = textureLoader.load(
-                      texUrl,
-                      (loadedTexture) => {
-                        console.log('Texture loaded for:', modelType);
-                        loadedTexture.colorSpace = THREE.SRGBColorSpace;
-                        loadedTexture.minFilter = THREE.LinearFilter;
-                        loadedTexture.magFilter = THREE.LinearFilter;
-                        loadedTexture.flipY = false;
-                        loadedTexture.needsUpdate = true;
-                      },
-                      undefined,
-                      (error) => {
-                        console.error(
-                          'Texture load error for:',
-                          modelType,
-                          error
-                        );
-                      }
-                    );
+                    const texture = textureLoader.load(texUrl);
+                    texture.colorSpace = THREE.SRGBColorSpace;
+                    texture.minFilter = THREE.LinearFilter;
+                    texture.magFilter = THREE.LinearFilter;
+                    texture.flipY = false;
+                    texture.needsUpdate = true;
 
                     child.material = new THREE.MeshPhysicalMaterial({
                       map: texture,
                       side: THREE.DoubleSide,
-                      roughness: 1,
-                      metalness: 0.0,
-                      envMapIntensity: 1.0,
-                      clearcoat: 0.0,
-                      clearcoatRoughness: 0.0,
-                      transmission: 0.0,
-                      thickness: 0.0,
                       transparent: true,
-                      opacity: 1.0,
-                      depthWrite: false, // 추가: 투명도 설정 시 depthWrite 비활성화
-                      depthTest: true, // depthTest 활성화
+                      depthWrite: false,
+                      depthTest: true,
                     });
                   } else {
                     child.material = new THREE.MeshStandardMaterial({
@@ -151,27 +110,19 @@ const AvatarModel = ({
                       roughness: 0.7,
                       metalness: 0.0,
                       side: THREE.DoubleSide,
-                      depthWrite: true,
-                      depthTest: true,
                     });
                   }
 
-                  // renderOrder 설정: 상의는 먼저 렌더링
                   if (modelType === 'shirt' || modelType === 'upperClothing') {
-                    child.renderOrder = 1; // 상의는 먼저 렌더링
+                    child.renderOrder = 1;
                   } else {
-                    child.renderOrder = 2; // 기타는 나중에 렌더링
+                    child.renderOrder = 2;
                   }
                 }
               });
               resolve(loadedObj);
             },
-            (xhr) => {
-              console.log(
-                `Loading ${modelType}:`,
-                (xhr.loaded / xhr.total) * 100 + '%'
-              );
-            },
+            undefined,
             reject
           );
         });
@@ -191,13 +142,6 @@ const AvatarModel = ({
 
     const loadModel = async () => {
       try {
-        console.log(`Loading ${modelType} model:`, {
-          modelUrl,
-          textureUrl,
-          mtlUrl,
-          showClothing,
-        });
-
         const loadedModel = await loadSingleModel(modelUrl, textureUrl, mtlUrl);
         if (loadedModel) {
           loadedModel.traverse((child) => {
@@ -220,9 +164,7 @@ const AvatarModel = ({
 
     return () => {
       if (groupCurrent && currentModel) {
-        console.log(`Cleaning up ${modelType} model`);
         groupCurrent.remove(currentModel);
-        // 메모리 누수를 방지하기 위해 모델을 dispose 합니다.
         currentModel.traverse((child) => {
           if (child instanceof THREE.Mesh) {
             if (child.geometry) child.geometry.dispose();
@@ -237,18 +179,11 @@ const AvatarModel = ({
         });
       }
     };
-  }, [modelUrl, textureUrl, mtlUrl, loadSingleModel, modelType, showClothing]);
+  }, [modelUrl, textureUrl, mtlUrl, loadSingleModel, modelType]);
 
   if (error) {
     console.error(`Model error (${modelType}):`, error);
-    return (
-      <group ref={groupRef}>
-        <mesh>
-          <planeGeometry args={[1, 1]} />
-          <meshBasicMaterial color="red" />
-        </mesh>
-      </group>
-    );
+    return null;
   }
 
   const shouldRenderModel = () => {
@@ -266,23 +201,11 @@ const AvatarModel = ({
       case 'skirt':
         return showSkirt;
       default:
-        return false;
+        return true;
     }
   };
 
-  const isVisible = shouldRenderModel();
-
-  console.log(`Model visibility check (${modelType}):`, {
-    showClothing,
-    showPants,
-    showShortPants,
-    showShirt,
-    showSkirt,
-    isVisible,
-    modelUrl,
-  });
-
-  if (!isVisible) {
+  if (!shouldRenderModel()) {
     return null;
   }
 

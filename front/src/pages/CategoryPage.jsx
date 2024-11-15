@@ -1,61 +1,49 @@
-// src/pages/CategoryPage.jsx
-import React, { useEffect, useState } from 'react';
-import { Box } from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { Box, VStack } from '@chakra-ui/react';
 import { useParams } from 'react-router-dom';
+import { ClothingProvider } from '../components/ClothingContext';
 import Categories from '../components/Categories';
+import AvatarViewer from '../components/AvatarViewer';
 import ProductGrid from '../components/ProductGrid';
-import axios from 'axios';
 
 const CategoryPage = () => {
-  const [products, setProducts] = useState([]);
-  const { categoryName } = useParams(); // URL에서 카테고리 이름 가져오기
-  const [selectedCategory, setSelectedCategory] = useState('');
-
-  // 제품 데이터 가져오기
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const API_URL = process.env.REACT_APP_API_URL;
-        const response = await axios.get(`${API_URL}/clothes/`);
-        setProducts(response.data.clothes);
-      } catch (error) {
-        console.error('Failed to fetch products:', error);
-      }
-    };
-
-    fetchProducts();
-  }, []);
-
-  // URL 파라미터 변경 시 카테고리 업데이트
-  useEffect(() => {
-    setSelectedCategory(categoryName || 'All');
-  }, [categoryName]);
-
-  const filteredProducts =
-    selectedCategory === 'All'
-      ? products
-      : products.filter(
-          (product) =>
-            product.clo_desc.toLowerCase() === selectedCategory.toLowerCase()
-        );
+  const { categoryName } = useParams();
+  const [selectedCategory, setSelectedCategory] = useState(
+    categoryName || 'All'
+  );
 
   return (
-    <Box
-      maxWidth="600px"
-      margin="0 auto"
-      bg="white"
-      display="flex"
-      flexDirection="column"
-      pt="50px"
-      pb="50px"
-      position="relative"
-    >
-      <Categories
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-      />
-      <ProductGrid products={filteredProducts} />
-    </Box>
+    <ClothingProvider>
+      <VStack
+        spacing={4}
+        width="100%"
+        maxW="600px"
+        mx="auto"
+        px={4}
+        pb={12}
+        pt="50px"
+      >
+        {/* 상단 카테고리 */}
+        <Box width="100%">
+          <Categories
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+          />
+        </Box>
+
+        {/* 제품 그리드 */}
+        <Box
+          width="100%"
+          maxH="100%"
+          borderRadius="2xl"
+          boxShadow="base"
+          bg="white"
+          overflow="hidden"
+        >
+          <ProductGrid selectedCategory={selectedCategory} />
+        </Box>
+      </VStack>
+    </ClothingProvider>
   );
 };
 

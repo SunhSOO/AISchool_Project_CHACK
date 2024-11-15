@@ -1,54 +1,119 @@
 // src/pages/ShoppingPage.jsx
-import React, { useEffect, useState } from 'react';
-import { Box, VStack } from '@chakra-ui/react';
-import MainImage from '../components/MainImage';
+import React, { useState } from 'react';
+import {
+  Box,
+  VStack,
+  useBreakpointValue,
+  Flex,
+  IconButton,
+  Text,
+  Button,
+} from '@chakra-ui/react';
+import { ChevronUp, ChevronDown } from 'lucide-react';
+import { ClothingProvider } from '../components/ClothingContext';
 import Categories from '../components/Categories';
+import AvatarViewer from '../components/AvatarViewer';
 import ProductGrid from '../components/ProductGrid';
-import axios from 'axios';
+import AvatarSelectionModal from '../components/AvatarSelectionModal'; // 새로 추가한 모달 컴포넌트
 
 const ShoppingPage = () => {
-  const [products, setProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [isAvatarExpanded, setIsAvatarExpanded] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태 관리
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const API_URL = process.env.REACT_APP_API_URL;
-        const response = await axios.get(`${API_URL}/clothes/`);
-        setProducts(response.data.clothes);
-      } catch (error) {
-        console.error('Failed to fetch products:', error);
-      }
-    };
-
-    fetchProducts();
-  }, []);
-
-  const filteredProducts =
-    selectedCategory === 'All'
-      ? products
-      : products.filter((product) => product.clo_desc === selectedCategory);
+  // 모바일에서 아바타 뷰어의 높이를 조절
+  const avatarHeight = useBreakpointValue({
+    base: '50vh', // 모바일
+    md: '60vh', // 태블릿/데스크톱
+  });
 
   return (
-    <Box
-      maxWidth="600px"
-      margin="0 auto"
-      bg="white"
-      display="flex"
-      flexDirection="column"
-      pt="50px"
-      pb="50px"
-      position="relative"
-    >
-      <VStack spacing={4} align="stretch" flexGrow={1}>
-        <MainImage />
-        <Categories
-          selectedCategory={selectedCategory}
-          setSelectedCategory={setSelectedCategory}
-        />
-        <ProductGrid products={filteredProducts} />
+    <ClothingProvider>
+      <VStack
+        spacing={4}
+        width="100%"
+        maxW="600px"
+        mx="auto"
+        px={4}
+        mt={16}
+        mb={16}
+      >
+        {/* 아바타 뷰어 토글 헤더 */}
+        <Flex
+          w="100%"
+          h="40px"
+          bg="gray.100"
+          alignItems="center"
+          justifyContent="space-between"
+          px={4}
+          cursor="pointer"
+          onClick={() => setIsAvatarExpanded(!isAvatarExpanded)}
+          _hover={{ bg: 'gray.200' }}
+          borderRadius="3xl"
+        >
+          <Text fontWeight="medium">아바타 뷰어</Text>
+          <IconButton
+            icon={isAvatarExpanded ? <ChevronUp /> : <ChevronDown />}
+            variant="ghost"
+            size="sm"
+            aria-label={isAvatarExpanded ? '접기' : '펼치기'}
+          />
+        </Flex>
+
+        {/* 아바타 뷰어 영역 */}
+        <Box
+          width="100%"
+          height={isAvatarExpanded ? avatarHeight : '0'}
+          borderRadius="2xl"
+          overflow="hidden"
+          boxShadow="base"
+          bg="gray.50"
+          transition="height 0.3s ease-in-out"
+          opacity={isAvatarExpanded ? 1 : 0}
+          visibility={isAvatarExpanded ? 'visible' : 'hidden'}
+        >
+          <AvatarViewer />
+          {/* 아바타 선택 버튼 */}
+          {isAvatarExpanded && (
+            <Flex justify="center" mt={2}>
+              <Button
+                colorScheme="blue"
+                size="sm"
+                onClick={() => setIsModalOpen(true)}
+              >
+                아바타 선택
+              </Button>
+            </Flex>
+          )}
+        </Box>
+
+        {/* 상단 카테고리 */}
+        <Box width="100%">
+          <Categories
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+          />
+        </Box>
+
+        {/* 제품 그리드 영역 */}
+        <Box
+          width="100%"
+          borderRadius="2xl"
+          boxShadow="base"
+          bg="white"
+          flex="1"
+          overflow="hidden"
+        >
+          <ProductGrid selectedCategory={selectedCategory} />
+        </Box>
       </VStack>
-    </Box>
+
+      {/* 아바타 선택 모달 */}
+      <AvatarSelectionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
+    </ClothingProvider>
   );
 };
 
