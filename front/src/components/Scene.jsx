@@ -1,7 +1,9 @@
 // src/components/Scene.jsx
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Environment } from '@react-three/drei';
 import AvatarModel from './AvatarModel';
+import PropTypes from 'prop-types';
+import { Box, Text } from '@chakra-ui/react';
 
 const Scene = ({
   showAvatar,
@@ -10,162 +12,147 @@ const Scene = ({
   showShortPants,
   showShirt,
   showSkirt,
-  gender = 'female',
+  gender,
   clo_3d,
-  avatarIndex = '28',
+  avatarIndex,
 }) => {
-  // 실제 모델 경로
-  const AVATAR_PATH = `${process.env.REACT_APP_API_URL}/uploads/avatars/models`;
-  const CLOTHING_PATH = `${process.env.REACT_APP_API_URL}/uploads/fittings`;
+  const MODEL_PATH =
+    process.env.REACT_APP_MODEL_PATH || '/files/avatars/models';
 
-  // 실제 모델 파일 구조
-  const REAL_MODEL_FILES = {
-    body: {
-      obj: `${AVATAR_PATH}/body_${avatarIndex}_${gender}.obj`,
-      mtl: null,
-    },
-    tshirt: {
-      obj: `${CLOTHING_PATH}/garment_${avatarIndex}_${gender}_tshirt.obj`,
-    },
-    pants: {
-      obj: `${CLOTHING_PATH}/garment_${avatarIndex}_${gender}_pants.obj`,
-    },
-    shortPants: {
-      obj: `${CLOTHING_PATH}/garment_${avatarIndex}_${gender}_shortpants.obj`,
-    },
-    shirt: {
-      obj: `${CLOTHING_PATH}/garment_${avatarIndex}_${gender}_shirt.obj`,
-    },
-    skirt:
-      gender === 'female'
-        ? {
-            obj: `${CLOTHING_PATH}/garment_${avatarIndex}_${gender}_skirt.obj`,
-          }
-        : null,
-  };
-
-  // 테스트 모델 경로
-  const MODEL_URL = `${process.env.REACT_APP_API_URL}${process.env.REACT_APP_MODEL_PATH}`;
-
-  // 테스트 모델 파일 구조
-  const TEST_MODEL_FILES = {
-    female: {
+  const TEST_MODEL_FILES = useMemo(
+    () => ({
       body: {
-        obj: `${MODEL_URL}/body_apose.obj`,
-        mtl: `${MODEL_URL}/body_A_pose.mtl`,
-      },
-      tshirt: {
-        obj: `${MODEL_URL}/t-shirt_apose.obj`,
-        texture: '/textures/t-shirt01.png',
-      },
-      pants: {
-        obj: `${MODEL_URL}/pant_apose.obj`,
-        texture: '/textures/pants_texture1.png',
-      },
-      shortPants: {
-        obj: `${MODEL_URL}/short-pant_apose.obj`,
-        texture: '/textures/short-pants_texture1.png',
-      },
-      shirt: {
-        obj: `${MODEL_URL}/shirt_apose.obj`,
-        texture: '/textures/shirt_texture1.png',
-      },
-      skirt: {
-        obj: `${MODEL_URL}/skirt_apose.obj`,
-        texture: '/textures/skirt_texture1.png',
-      },
-    },
-    male: {
-      body: {
-        obj: `${MODEL_URL}/body_0_male_pant.obj`,
+        obj: `/files/avatars/models/body_0_${gender}_pant.obj`,
         mtl: null,
       },
       tshirt: {
-        obj: `${MODEL_URL}/garment_0_male_t-shirt.obj`,
-        texture: '/textures/m_t-shirt_texture1.png',
+        obj: `/files/avatars/models/garment_0_${gender}_t-shirt.obj`,
+        texture: `/textures/${
+          gender === 'male' ? 'm_' : ''
+        }t-shirt_texture1.png`,
       },
       pants: {
-        obj: `${MODEL_URL}/garment_0_male_pant.obj`,
-        texture: '/textures/m_pants_texture1.png',
+        obj: `/files/avatars/models/garment_0_${gender}_pant.obj`,
+        texture: `/textures/${gender === 'male' ? 'm_' : ''}pants_texture1.png`,
       },
       shortPants: {
-        obj: `${MODEL_URL}/garment_0_male_short-pant.obj`,
-        texture: '/textures/m_short-pants_texture1.png',
+        obj: `/files/avatars/models/garment_0_${gender}_short-pant.obj`,
+        texture: `/textures/${
+          gender === 'male' ? 'm_' : ''
+        }short-pants_texture1.png`,
       },
       shirt: {
-        obj: `${MODEL_URL}/garment_0_male_shirt.obj`,
-        texture: '/textures/m_shirt_texture1.png',
+        obj: `/files/avatars/models/garment_0_${gender}_shirt.obj`,
+        texture: `/textures/${gender === 'male' ? 'm_' : ''}shirt_texture1.png`,
       },
-    },
-  };
+      skirt: {
+        obj: `/files/avatars/models/garment_0_${gender}_skirt.obj`,
+        texture: `/textures/${gender === 'male' ? 'm_' : ''}skirt_texture1.png`,
+      },
+    }),
+    [gender]
+  );
 
   const hasRealModel = clo_3d && Object.keys(clo_3d).length > 0;
-  // 현재 사용할 모델 선택
-  const currentModels = hasRealModel ? clo_3d : TEST_MODEL_FILES[gender];
+  const currentModels = hasRealModel ? clo_3d : TEST_MODEL_FILES;
 
   console.log('Scene rendering:', {
     hasRealModel,
     gender,
+    avatarIndex,
     modelType: hasRealModel ? 'Real Model' : 'Test Model',
     currentModels,
   });
 
+  if (!currentModels.body || !currentModels.body.obj) {
+    console.error('body.obj 경로가 설정되지 않았습니다.', currentModels);
+    return (
+      <Box>
+        <Text color="red.500">바디 모델을 로드할 수 없습니다.</Text>
+      </Box>
+    );
+  }
+
   return (
     <>
+      <ambientLight intensity={0.5} />
+      <directionalLight position={[5, 5, 5]} intensity={0.8} castShadow />
+      <pointLight position={[10, 10, 10]} intensity={0.5} />
+      <spotLight
+        position={[-5, 5, 0]}
+        intensity={0.5}
+        angle={0.3}
+        penumbra={1}
+        castShadow
+      />
       <Environment preset="studio" />
 
-      {/* Avatar Body */}
       <AvatarModel
         modelUrl={currentModels.body.obj}
-        mtlUrl={hasRealModel ? null : currentModels.body.mtl}
+        mtlUrl={currentModels.body?.mtl ?? null}
         textureUrl={null}
-        showClothing={showAvatar}
+        showClothing={true}
         modelType="body"
       />
 
-      {/* T-Shirt */}
-      <AvatarModel
-        modelUrl={currentModels.tshirt.obj}
-        textureUrl={hasRealModel ? null : currentModels.tshirt.texture}
-        showClothing={showClothing}
-        modelType="tshirt"
-      />
+      {showClothing && currentModels.tshirt && (
+        <AvatarModel
+          modelUrl={currentModels.tshirt.obj}
+          textureUrl={currentModels.tshirt.texture}
+          showClothing={true}
+          modelType="tshirt"
+        />
+      )}
 
-      {/* Pants */}
-      <AvatarModel
-        modelUrl={currentModels.pants.obj}
-        textureUrl={hasRealModel ? null : currentModels.pants.texture}
-        showPants={showPants}
-        modelType="pants"
-      />
+      {showPants && currentModels.pants && (
+        <AvatarModel
+          modelUrl={currentModels.pants.obj}
+          textureUrl={currentModels.pants.texture}
+          showClothing={true}
+          modelType="pants"
+        />
+      )}
 
-      {/* Short Pants */}
-      <AvatarModel
-        modelUrl={currentModels.shortPants.obj}
-        textureUrl={hasRealModel ? null : currentModels.shortPants.texture}
-        showShortPants={showShortPants}
-        modelType="shortPants"
-      />
+      {showShortPants && currentModels.shortPants && (
+        <AvatarModel
+          modelUrl={currentModels.shortPants.obj}
+          textureUrl={currentModels.shortPants.texture}
+          showClothing={true}
+          modelType="shortPants"
+        />
+      )}
 
-      {/* Shirt */}
-      <AvatarModel
-        modelUrl={currentModels.shirt.obj}
-        textureUrl={hasRealModel ? null : currentModels.shirt.texture}
-        showShirt={showShirt}
-        modelType="shirt"
-      />
+      {showShirt && currentModels.shirt && (
+        <AvatarModel
+          modelUrl={currentModels.shirt.obj}
+          textureUrl={currentModels.shirt.texture}
+          showClothing={true}
+          modelType="shirt"
+        />
+      )}
 
-      {/* Skirt - 여성 모델만 */}
-      {currentModels.skirt && (
+      {gender === 'female' && showSkirt && currentModels.skirt && (
         <AvatarModel
           modelUrl={currentModels.skirt.obj}
-          textureUrl={hasRealModel ? null : currentModels.skirt?.texture}
-          showSkirt={showSkirt}
+          textureUrl={currentModels.skirt.texture}
+          showClothing={true}
           modelType="skirt"
         />
       )}
     </>
   );
+};
+
+Scene.propTypes = {
+  showAvatar: PropTypes.bool,
+  showClothing: PropTypes.bool,
+  showPants: PropTypes.bool,
+  showShortPants: PropTypes.bool,
+  showShirt: PropTypes.bool,
+  showSkirt: PropTypes.bool,
+  gender: PropTypes.string.isRequired,
+  clo_3d: PropTypes.object,
+  avatarIndex: PropTypes.number,
 };
 
 export default Scene;
