@@ -1,7 +1,9 @@
 // src/components/Scene.jsx
-import React, { useMemo } from 'react';
+
+import React from 'react';
 import { Environment } from '@react-three/drei';
 import AvatarModel from './AvatarModel';
+import ErrorBoundary from './ErrorBoundary';
 import PropTypes from 'prop-types';
 import { Box, Text } from '@chakra-ui/react';
 
@@ -16,51 +18,17 @@ const Scene = ({
   clo_3d,
   avatarIndex,
 }) => {
-  const MODEL_PATH =
-    process.env.REACT_APP_MODEL_PATH || '/files/avatars/models';
-
-  const TEST_MODEL_FILES = useMemo(
-    () => ({
-      body: {
-        obj: `/files/avatars/models/body_0_${gender}_pant.obj`,
-        mtl: null,
-      },
-      tshirt: {
-        obj: `/files/avatars/models/garment_0_${gender}_t-shirt.obj`,
-        texture: `/textures/${
-          gender === 'male' ? 'm_' : ''
-        }t-shirt_texture1.png`,
-      },
-      pants: {
-        obj: `/files/avatars/models/garment_0_${gender}_pant.obj`,
-        texture: `/textures/${gender === 'male' ? 'm_' : ''}pants_texture1.png`,
-      },
-      shortPants: {
-        obj: `/files/avatars/models/garment_0_${gender}_short-pant.obj`,
-        texture: `/textures/${
-          gender === 'male' ? 'm_' : ''
-        }short-pants_texture1.png`,
-      },
-      shirt: {
-        obj: `/files/avatars/models/garment_0_${gender}_shirt.obj`,
-        texture: `/textures/${gender === 'male' ? 'm_' : ''}shirt_texture1.png`,
-      },
-      skirt: {
-        obj: `/files/avatars/models/garment_0_${gender}_skirt.obj`,
-        texture: `/textures/${gender === 'male' ? 'm_' : ''}skirt_texture1.png`,
-      },
-    }),
-    [gender]
-  );
-
-  const hasRealModel = clo_3d && Object.keys(clo_3d).length > 0;
-  const currentModels = hasRealModel ? clo_3d : TEST_MODEL_FILES;
+  const currentModels = clo_3d;
 
   console.log('Scene rendering:', {
-    hasRealModel,
+    showAvatar,
+    showClothing,
+    showPants,
+    showShortPants,
+    showShirt,
+    showSkirt,
     gender,
     avatarIndex,
-    modelType: hasRealModel ? 'Real Model' : 'Test Model',
     currentModels,
   });
 
@@ -87,58 +55,75 @@ const Scene = ({
       />
       <Environment preset="studio" />
 
-      <AvatarModel
-        modelUrl={currentModels.body.obj}
-        mtlUrl={currentModels.body?.mtl ?? null}
-        textureUrl={null}
-        showClothing={true}
-        modelType="body"
-      />
-
-      {showClothing && currentModels.tshirt && (
+      <ErrorBoundary>
         <AvatarModel
-          modelUrl={currentModels.tshirt.obj}
-          textureUrl={currentModels.tshirt.texture}
+          modelUrl={currentModels.body.obj}
+          mtlUrl={currentModels.body?.mtl ?? null}
+          textureUrl={null}
           showClothing={true}
-          modelType="tshirt"
+          modelType="body"
         />
+      </ErrorBoundary>
+
+      {showClothing && currentModels.tshirt && currentModels.tshirt.obj && (
+        <ErrorBoundary>
+          <AvatarModel
+            modelUrl={currentModels.tshirt.obj}
+            textureUrl={currentModels.tshirt.tex}
+            showClothing={showClothing}
+            modelType="tshirt"
+          />
+        </ErrorBoundary>
       )}
 
-      {showPants && currentModels.pants && (
-        <AvatarModel
-          modelUrl={currentModels.pants.obj}
-          textureUrl={currentModels.pants.texture}
-          showClothing={true}
-          modelType="pants"
-        />
+      {showPants && currentModels.pants && currentModels.pants.obj && (
+        <ErrorBoundary>
+          <AvatarModel
+            modelUrl={currentModels.pants.obj}
+            textureUrl={currentModels.pants.tex}
+            showPants={showPants}
+            modelType="pants"
+          />
+        </ErrorBoundary>
       )}
 
-      {showShortPants && currentModels.shortPants && (
-        <AvatarModel
-          modelUrl={currentModels.shortPants.obj}
-          textureUrl={currentModels.shortPants.texture}
-          showClothing={true}
-          modelType="shortPants"
-        />
+      {showShortPants &&
+        currentModels.shortPants &&
+        currentModels.shortPants.obj && (
+          <ErrorBoundary>
+            <AvatarModel
+              modelUrl={currentModels.shortPants.obj}
+              textureUrl={currentModels.shortPants.tex}
+              showShortPants={showShortPants}
+              modelType="shortPants"
+            />
+          </ErrorBoundary>
+        )}
+
+      {showShirt && currentModels.shirt && currentModels.shirt.obj && (
+        <ErrorBoundary>
+          <AvatarModel
+            modelUrl={currentModels.shirt.obj}
+            textureUrl={currentModels.shirt.tex}
+            showShirt={showShirt}
+            modelType="shirt"
+          />
+        </ErrorBoundary>
       )}
 
-      {showShirt && currentModels.shirt && (
-        <AvatarModel
-          modelUrl={currentModels.shirt.obj}
-          textureUrl={currentModels.shirt.texture}
-          showClothing={true}
-          modelType="shirt"
-        />
-      )}
-
-      {gender === 'female' && showSkirt && currentModels.skirt && (
-        <AvatarModel
-          modelUrl={currentModels.skirt.obj}
-          textureUrl={currentModels.skirt.texture}
-          showClothing={true}
-          modelType="skirt"
-        />
-      )}
+      {gender === 'female' &&
+        showSkirt &&
+        currentModels.skirt &&
+        currentModels.skirt.obj && (
+          <ErrorBoundary>
+            <AvatarModel
+              modelUrl={currentModels.skirt.obj}
+              textureUrl={currentModels.skirt.tex}
+              showSkirt={showSkirt}
+              modelType="skirt"
+            />
+          </ErrorBoundary>
+        )}
     </>
   );
 };

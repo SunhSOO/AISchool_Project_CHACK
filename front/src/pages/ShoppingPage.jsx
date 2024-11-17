@@ -10,21 +10,20 @@ import {
   Button,
 } from '@chakra-ui/react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
-import { ClothingProvider } from '../components/ClothingContext';
+import { ClothingProvider } from '../contexts/ClothingContext';
 import Categories from '../components/Categories';
 import AvatarViewer from '../components/AvatarViewer';
 import ProductGrid from '../components/ProductGrid';
-import AvatarSelectionModal from '../components/AvatarSelectionModal'; // 새로 추가한 모달 컴포넌트
+import AvatarSelectionModal from '../components/AvatarSelectionModal';
 
 const ShoppingPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [isAvatarExpanded, setIsAvatarExpanded] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태 관리
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // 모바일에서 아바타 뷰어의 높이를 조절
   const avatarHeight = useBreakpointValue({
-    base: '50vh', // 모바일
-    md: '60vh', // 태블릿/데스크톱
+    base: '50vh',
+    md: '60vh',
   });
 
   return (
@@ -38,7 +37,6 @@ const ShoppingPage = () => {
         mt={16}
         mb={16}
       >
-        {/* 아바타 뷰어 토글 헤더 */}
         <Flex
           w="100%"
           h="40px"
@@ -60,7 +58,6 @@ const ShoppingPage = () => {
           />
         </Flex>
 
-        {/* 아바타 뷰어 영역 */}
         <Box
           width="100%"
           height={isAvatarExpanded ? avatarHeight : '0'}
@@ -73,7 +70,6 @@ const ShoppingPage = () => {
           visibility={isAvatarExpanded ? 'visible' : 'hidden'}
         >
           <AvatarViewer />
-          {/* 아바타 선택 버튼 */}
           {isAvatarExpanded && (
             <Flex justify="center" mt={2}>
               <Button
@@ -87,7 +83,6 @@ const ShoppingPage = () => {
           )}
         </Box>
 
-        {/* 상단 카테고리 */}
         <Box width="100%">
           <Categories
             selectedCategory={selectedCategory}
@@ -95,7 +90,6 @@ const ShoppingPage = () => {
           />
         </Box>
 
-        {/* 제품 그리드 영역 */}
         <Box
           width="100%"
           borderRadius="2xl"
@@ -108,7 +102,6 @@ const ShoppingPage = () => {
         </Box>
       </VStack>
 
-      {/* 아바타 선택 모달 */}
       <AvatarSelectionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

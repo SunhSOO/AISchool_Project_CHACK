@@ -1,16 +1,28 @@
+// src/components/AvatarViewer.jsx
+
 import React, { Suspense, useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
-import { Box, Text, Flex, Spinner } from '@chakra-ui/react';
+import {
+  Box,
+  Text,
+  Flex,
+  Spinner,
+  Button,
+  VStack,
+  HStack,
+} from '@chakra-ui/react';
 import Scene from './Scene';
 import Loader from './Loader';
 import { useClothing } from '../contexts/ClothingContext';
 import { getAvatarData } from '../services/api';
+import { useToast } from '@chakra-ui/react';
 
 const AvatarViewer = () => {
   const { activeClothing, updateClothing } = useClothing();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const toast = useToast();
 
   useEffect(() => {
     const loadAvatarData = async () => {
@@ -23,9 +35,12 @@ const AvatarViewer = () => {
           gender: data.gender,
           clo_3d: data.clo_3d,
         });
+
+        // clo_3d 구조 확인
+        console.log('Updated clo_3d:', data.clo_3d);
       } catch (error) {
         console.error('아바타 로드 실패:', error);
-        setError(error.message);
+        setError(error.message || '아바타 로드에 실패했습니다.');
       } finally {
         setIsLoading(false);
       }
@@ -33,6 +48,39 @@ const AvatarViewer = () => {
 
     loadAvatarData();
   }, [updateClothing]);
+
+  const handleRetry = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await getAvatarData();
+      console.log('Retrying to load avatar data:', data);
+
+      updateClothing({
+        avatarIndex: data.avatarIndex,
+        gender: data.gender,
+        clo_3d: data.clo_3d,
+      });
+
+      // clo_3d 구조 확인
+      console.log('Updated clo_3d on retry:', data.clo_3d);
+    } catch (err) {
+      console.error('아바타 로드 실패:', err);
+      setError(err.message || '아바타 로드에 실패했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 의류 표시 상태를 토글하는 함수
+  const toggleClothing = (clothingType) => {
+    console.log(`Toggling ${clothingType}`);
+    const newState = !activeClothing[`show${clothingType}`];
+    console.log(`New state for show${clothingType}:`, newState);
+    updateClothing({
+      [`show${clothingType}`]: newState,
+    });
+  };
 
   if (isLoading) {
     return (
@@ -54,34 +102,70 @@ const AvatarViewer = () => {
         height="100%"
         justifyContent="center"
         alignItems="center"
+        direction="column"
         color="red.500"
       >
-        <Text>{error}</Text>
+        <Text mb={4}>{error}</Text>
+        <Button onClick={handleRetry} colorScheme="blue">
+          다시 시도
+        </Button>
       </Flex>
     );
   }
 
   return (
     <Box position="relative" width="100%" height="100%" zIndex={1}>
-      {!activeClothing.clo_3d && (
-        <Flex
-          position="absolute"
-          top="20px"
-          right="20px"
-          zIndex={2}
-          bg="blue.500"
-          color="white"
-          px={4}
-          py={2}
-          borderRadius="md"
-          alignItems="center"
-          boxShadow="lg"
-        >
-          <Text fontSize="sm" fontWeight="medium">
-            아바타를 생성 중입니다...
+      {/* 의류 토글 버튼 섹션 */}
+      <Box position="absolute" top="10px" left="10px" zIndex={2}>
+        <VStack spacing={2} align="start">
+          <Text fontWeight="bold" mb={2}>
+            의류 토글
           </Text>
-        </Flex>
-      )}
+          <HStack spacing={2}>
+            <Button
+              size="sm"
+              colorScheme={activeClothing.showClothing ? 'green' : 'gray'}
+              onClick={() => toggleClothing('Clothing')}
+            >
+              {activeClothing.showClothing ? 'T-Shirt 끄기' : 'T-Shirt 켜기'}
+            </Button>
+            <Button
+              size="sm"
+              colorScheme={activeClothing.showShirt ? 'green' : 'gray'}
+              onClick={() => toggleClothing('Shirt')}
+            >
+              {activeClothing.showShirt ? 'Shirt 끄기' : 'Shirt 켜기'}
+            </Button>
+          </HStack>
+          <HStack spacing={2}>
+            <Button
+              size="sm"
+              colorScheme={activeClothing.showPants ? 'green' : 'gray'}
+              onClick={() => toggleClothing('Pants')}
+            >
+              {activeClothing.showPants ? 'Pants 끄기' : 'Pants 켜기'}
+            </Button>
+            <Button
+              size="sm"
+              colorScheme={activeClothing.showShortPants ? 'green' : 'gray'}
+              onClick={() => toggleClothing('ShortPants')}
+            >
+              {activeClothing.showShortPants
+                ? 'Short Pants 끄기'
+                : 'Short Pants 켜기'}
+            </Button>
+          </HStack>
+          {activeClothing.gender === 'female' && (
+            <Button
+              size="sm"
+              colorScheme={activeClothing.showSkirt ? 'green' : 'gray'}
+              onClick={() => toggleClothing('Skirt')}
+            >
+              {activeClothing.showSkirt ? 'Skirt 끄기' : 'Skirt 켜기'}
+            </Button>
+          )}
+        </VStack>
+      </Box>
 
       <Canvas
         shadows

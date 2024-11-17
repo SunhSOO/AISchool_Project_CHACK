@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, VStack } from '@chakra-ui/react';
 import { useParams } from 'react-router-dom';
-import { ClothingProvider } from '../components/ClothingContext';
+import { ClothingProvider } from '../contexts/ClothingContext';
 import Categories from '../components/Categories';
 import AvatarViewer from '../components/AvatarViewer';
 import ProductGrid from '../components/ProductGrid';

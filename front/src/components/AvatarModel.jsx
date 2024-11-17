@@ -1,9 +1,12 @@
 // src/components/AvatarModel.jsx
+
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
 import { TextureLoader } from 'three';
 import * as THREE from 'three';
+import PropTypes from 'prop-types';
+import { Box, Text } from '@chakra-ui/react';
 
 const AvatarModel = ({
   modelUrl,
@@ -19,7 +22,14 @@ const AvatarModel = ({
   const groupRef = useRef();
   const [model, setModel] = useState(null);
   const [error, setError] = useState(null);
+  const materialCache = useRef({});
 
+  /**
+   * UV 좌표 생성 함수
+   * 만약 geometry에 UV 좌표가 없다면 자동으로 생성
+   * @param {THREE.BufferGeometry} geometry
+   * @returns {THREE.BufferGeometry}
+   */
   const generateUVs = (geometry) => {
     const positions = geometry.attributes.position;
     const uvs = [];
@@ -43,18 +53,86 @@ const AvatarModel = ({
     return geometry;
   };
 
+  /**
+   * 텍스처 로딩 및 재질 생성 함수
+   * @param {string} texUrl - 텍스처 URL
+   * @returns {THREE.MeshPhysicalMaterial | THREE.MeshStandardMaterial}
+   */
+  const getMaterial = (texUrl) => {
+    if (materialCache.current[texUrl]) {
+      return materialCache.current[texUrl];
+    }
+
+    const texture = new TextureLoader().load(
+      texUrl,
+      undefined,
+      undefined,
+      (err) => {
+        console.error(`Texture loading failed for ${texUrl}:`, err);
+        // 폴백 텍스처 로드
+        const fallbackTexture = new TextureLoader().load(
+          '/textures/default.png',
+          undefined,
+          undefined,
+          (fallbackErr) => {
+            console.error('Fallback texture loading failed:', fallbackErr);
+          }
+        );
+        fallbackTexture.colorSpace = THREE.SRGBColorSpace;
+        fallbackTexture.minFilter = THREE.LinearFilter;
+        fallbackTexture.magFilter = THREE.LinearFilter;
+        fallbackTexture.flipY = false;
+
+        const fallbackMaterial = new THREE.MeshPhysicalMaterial({
+          map: fallbackTexture,
+          side: THREE.DoubleSide,
+          transparent: true,
+          depthWrite: false,
+          depthTest: true,
+        });
+
+        materialCache.current[texUrl] = fallbackMaterial;
+      }
+    );
+
+    // sRGBColorSpace 및 필터 설정
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    texture.flipY = false;
+
+    const material = new THREE.MeshPhysicalMaterial({
+      map: texture,
+      side: THREE.DoubleSide,
+      transparent: true,
+      depthWrite: false,
+      depthTest: true,
+    });
+
+    materialCache.current[texUrl] = material;
+    return material;
+  };
+
+  /**
+   * 단일 모델 로드 함수
+   * @param {string} url - OBJ 파일 URL
+   * @param {string|null} texUrl - 텍스처 URL
+   * @param {string|null} mtlUrl - MTL 파일 URL
+   * @returns {Promise<THREE.Object3D | null>}
+   */
   const loadSingleModel = useCallback(
     async (url, texUrl = null, mtlUrl = null) => {
-      if (!url) return null;
+      if (!url) {
+        console.warn(`Model URL is null for modelType: ${modelType}`);
+        return null;
+      }
 
       console.log('Loading model:', { url, modelType });
 
       const objLoader = new OBJLoader();
       const mtlLoader = new MTLLoader();
-      const textureLoader = new TextureLoader();
 
       try {
-        // MTL 로딩 시도
         let materials = null;
         if (mtlUrl) {
           try {
@@ -66,17 +144,23 @@ const AvatarModel = ({
                   resolve(loadedMaterials);
                 },
                 undefined,
-                reject
+                (error) => {
+                  console.error(
+                    `Failed to load MTL file from ${mtlUrl}:`,
+                    error
+                  );
+                  resolve(null); // Continue without materials
+                }
               );
             });
+            if (materials) {
+              objLoader.setMaterials(materials);
+              console.log(`Successfully loaded MTL for ${modelType}`);
+            }
           } catch (err) {
             console.warn('MTL loading failed:', err);
             materials = null;
           }
-        }
-
-        if (materials) {
-          objLoader.setMaterials(materials);
         }
 
         const obj = await new Promise((resolve, reject) => {
@@ -90,20 +174,7 @@ const AvatarModel = ({
                   }
 
                   if (texUrl) {
-                    const texture = textureLoader.load(texUrl);
-                    texture.colorSpace = THREE.SRGBColorSpace;
-                    texture.minFilter = THREE.LinearFilter;
-                    texture.magFilter = THREE.LinearFilter;
-                    texture.flipY = false;
-                    texture.needsUpdate = true;
-
-                    child.material = new THREE.MeshPhysicalMaterial({
-                      map: texture,
-                      side: THREE.DoubleSide,
-                      transparent: true,
-                      depthWrite: false,
-                      depthTest: true,
-                    });
+                    child.material = getMaterial(texUrl);
                   } else {
                     child.material = new THREE.MeshStandardMaterial({
                       color: 0xcccccc,
@@ -120,16 +191,21 @@ const AvatarModel = ({
                   }
                 }
               });
+              console.log(`Successfully loaded OBJ for ${modelType}`);
               resolve(loadedObj);
             },
             undefined,
-            reject
+            (error) => {
+              console.error(`Failed to load OBJ file from ${url}:`, error);
+              reject(error);
+            }
           );
         });
 
         return obj;
       } catch (err) {
-        console.error(`Error loading ${modelType}:`, err);
+        console.error(`Error loading ${modelType} from ${url}:`, err);
+        setError('모델 로딩에 실패했습니다.');
         return null;
       }
     },
@@ -139,11 +215,12 @@ const AvatarModel = ({
   useEffect(() => {
     const groupCurrent = groupRef.current;
     let currentModel = null;
+    let isMounted = true;
 
     const loadModel = async () => {
       try {
         const loadedModel = await loadSingleModel(modelUrl, textureUrl, mtlUrl);
-        if (loadedModel) {
+        if (loadedModel && isMounted) {
           loadedModel.traverse((child) => {
             if (child instanceof THREE.Mesh) {
               child.castShadow = true;
@@ -153,16 +230,21 @@ const AvatarModel = ({
           currentModel = loadedModel;
           setModel(loadedModel);
           setError(null);
+          console.log(`Successfully loaded ${modelType} model.`);
         }
       } catch (err) {
-        console.error(`Error loading ${modelType}:`, err);
-        setError('모델 로딩 실패');
+        console.error(
+          `Error loading model in useEffect for ${modelType}:`,
+          err
+        );
+        if (isMounted) setError('모델 로딩에 실패했습니다.');
       }
     };
 
     loadModel();
 
     return () => {
+      isMounted = false;
       if (groupCurrent && currentModel) {
         groupCurrent.remove(currentModel);
         currentModel.traverse((child) => {
@@ -181,15 +263,14 @@ const AvatarModel = ({
     };
   }, [modelUrl, textureUrl, mtlUrl, loadSingleModel, modelType]);
 
-  if (error) {
-    console.error(`Model error (${modelType}):`, error);
-    return null;
-  }
-
+  /**
+   * 모델 렌더링 여부 결정 함수
+   * @returns {boolean}
+   */
   const shouldRenderModel = () => {
     switch (modelType) {
       case 'body':
-        return showClothing;
+        return true;
       case 'tshirt':
         return showClothing;
       case 'pants':
@@ -205,11 +286,46 @@ const AvatarModel = ({
     }
   };
 
+  // 전달된 props 확인을 위한 로그
+  useEffect(() => {
+    console.log(
+      `AvatarModel Props - modelType: ${modelType}, showClothing: ${showClothing}, showPants: ${showPants}, showShortPants: ${showShortPants}, showShirt: ${showShirt}, showSkirt: ${showSkirt}`
+    );
+  }, [
+    modelType,
+    showClothing,
+    showPants,
+    showShortPants,
+    showShirt,
+    showSkirt,
+  ]);
+
+  if (error) {
+    return (
+      <Box>
+        <Text color="red.500">{error}</Text>
+      </Box>
+    );
+  }
+
   if (!shouldRenderModel()) {
+    console.log(`Not rendering ${modelType} model based on show flags.`);
     return null;
   }
 
   return <group ref={groupRef}>{model && <primitive object={model} />}</group>;
+};
+
+AvatarModel.propTypes = {
+  modelUrl: PropTypes.string.isRequired,
+  textureUrl: PropTypes.string,
+  mtlUrl: PropTypes.string,
+  showClothing: PropTypes.bool,
+  showPants: PropTypes.bool,
+  showShortPants: PropTypes.bool,
+  showShirt: PropTypes.bool,
+  showSkirt: PropTypes.bool,
+  modelType: PropTypes.string,
 };
 
 export default AvatarModel;

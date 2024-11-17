@@ -16,13 +16,18 @@
 // // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 // reportWebVitals();
 // src/index.js
+// src/index.js
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
+import { ChakraProvider } from '@chakra-ui/react';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <ChakraProvider>
+      <App />
+    </ChakraProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

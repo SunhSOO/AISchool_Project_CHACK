@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, HStack, Button, Text, VStack, Flex } from '@chakra-ui/react';
 import { FaMale, FaFemale } from 'react-icons/fa';
-import { useClothing } from './ClothingContext';
+import { useClothing } from '../contexts/ClothingContext';
 
 const categories = ['All', 'T-shirt', 'Shirt', 'Pants', 'Skirt'];
 

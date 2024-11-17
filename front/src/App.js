@@ -24,7 +24,7 @@ import UserLooks from './pages/UserLooks';
 import SignupComponent from './pages/SignupComponent';
 import MyPage from './pages/MyPage';
 import LooksGallery from './pages/LooksGallery';
-import Avatar from './pages/Avatar';
+import AvatarViewer from './components/AvatarViewer'; // Avatar 컴포넌트 대신 AvatarViewer 임포트
 import MeasurementForm from './components/MeasurementForm';
 import Login from './pages/Login';
 import CheckoutPage from './pages/CheckoutPage';
@@ -77,10 +77,8 @@ const App = () => {
                     <Route path="/agreement" element={<AgreementPage />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<SignupComponent />} />
-
                     {/* 메인 페이지 라우트 */}
                     <Route path="/home" element={<Home />} />
-
                     {/* 아바타 생성 플로우 라우트 */}
                     <Route path="/camera-upload" element={<CameraUpload />} />
                     <Route
@@ -88,8 +86,8 @@ const App = () => {
                       element={<MeasurementForm />}
                     />
                     <Route path="/sizecheck" element={<SizeCheck />} />
-                    <Route path="/avatar" element={<Avatar />} />
-
+                    <Route path="/avatar" element={<AvatarViewer />} />{' '}
+                    {/* Avatar 대신 AvatarViewer로 변경 */}
                     {/* 쇼핑 관련 라우트 */}
                     <Route path="/shopping" element={<ShoppingPage />} />
                     <Route
@@ -97,14 +95,11 @@ const App = () => {
                       element={<CategoryPage />}
                     />
                     <Route path="/checkout" element={<CheckoutPage />} />
-
                     {/* 사용자 스타일 관련 라우트 */}
                     <Route path="/UserLooks" element={<UserLooks />} />
                     <Route path="/looksgallery" element={<LooksGallery />} />
-
                     {/* 사용자 설정 라우트 */}
                     <Route path="/mypage" element={<MyPage />} />
-
                     {/* 404 페이지 */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
