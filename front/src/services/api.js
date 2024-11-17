@@ -81,12 +81,15 @@ export const getAvatarData = async () => {
       tex: targetAvatar.fitting_urls.find((url) => url.includes(`_${type}.png`))
         ? `${baseTextureUrl}/${type}.png`
         : null,
+      mtl: targetAvatar.fitting_urls.find((url) => url.includes(`_${type}.mtl`))
+        ? `${baseTextureUrl}/${type}.mtl`
+        : null,
     });
 
     const modelPaths = {
-      body: { obj: targetAvatar.avatar_url },
+      body: { obj: targetAvatar.avatar_url, tex: null, mtl: null },
       tshirt: findAsset('t-shirt'),
-      pants: findAsset('pants'),
+      pants: findAsset('pant'),
       shirt: findAsset('shirt'),
       shortPants: findAsset('short-pant'),
       skirt: gender === 'female' ? findAsset('skirt') : null,

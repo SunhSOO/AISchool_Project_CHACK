@@ -8,6 +8,18 @@ import * as THREE from 'three';
 import PropTypes from 'prop-types';
 import { Box, Text } from '@chakra-ui/react';
 
+/**
+ * AvatarModel 컴포넌트
+ * @param {string} modelUrl - OBJ 파일의 URL
+ * @param {string} textureUrl - 텍스처 이미지의 URL (선택 사항)
+ * @param {string} mtlUrl - MTL 파일의 URL (선택 사항)
+ * @param {boolean} showClothing - 의류를 표시할지 여부
+ * @param {boolean} showPants - Pants 표시 여부
+ * @param {boolean} showShortPants - ShortPants 표시 여부
+ * @param {boolean} showShirt - Shirt 표시 여부
+ * @param {boolean} showSkirt - Skirt 표시 여부
+ * @param {string} modelType - 의류 타입 (예: 'shirt', 'pants' 등)
+ */
 const AvatarModel = ({
   modelUrl,
   textureUrl,
@@ -71,7 +83,7 @@ const AvatarModel = ({
         console.error(`Texture loading failed for ${texUrl}:`, err);
         // 폴백 텍스처 로드
         const fallbackTexture = new TextureLoader().load(
-          '/textures/default.png',
+          `${process.env.PUBLIC_URL}/textures/default.png`,
           undefined,
           undefined,
           (fallbackErr) => {
@@ -175,6 +187,10 @@ const AvatarModel = ({
 
                   if (texUrl) {
                     child.material = getMaterial(texUrl);
+                  } else if (materials) {
+                    // MTL 로드 성공 시
+                    child.material =
+                      materials.materials[Object.keys(materials.materials)[0]];
                   } else {
                     child.material = new THREE.MeshStandardMaterial({
                       color: 0xcccccc,

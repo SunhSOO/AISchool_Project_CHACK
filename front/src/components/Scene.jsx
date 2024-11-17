@@ -58,8 +58,8 @@ const Scene = ({
       <ErrorBoundary>
         <AvatarModel
           modelUrl={currentModels.body.obj}
-          mtlUrl={currentModels.body?.mtl ?? null}
-          textureUrl={null}
+          mtlUrl={currentModels.body.mtl || null}
+          textureUrl={currentModels.body.tex || null}
           showClothing={true}
           modelType="body"
         />
@@ -69,7 +69,8 @@ const Scene = ({
         <ErrorBoundary>
           <AvatarModel
             modelUrl={currentModels.tshirt.obj}
-            textureUrl={currentModels.tshirt.tex}
+            mtlUrl={currentModels.tshirt.mtl || null}
+            textureUrl={currentModels.tshirt.tex || null}
             showClothing={showClothing}
             modelType="tshirt"
           />
@@ -80,7 +81,8 @@ const Scene = ({
         <ErrorBoundary>
           <AvatarModel
             modelUrl={currentModels.pants.obj}
-            textureUrl={currentModels.pants.tex}
+            mtlUrl={currentModels.pants.mtl || null}
+            textureUrl={currentModels.pants.tex || null}
             showPants={showPants}
             modelType="pants"
           />
@@ -93,7 +95,8 @@ const Scene = ({
           <ErrorBoundary>
             <AvatarModel
               modelUrl={currentModels.shortPants.obj}
-              textureUrl={currentModels.shortPants.tex}
+              mtlUrl={currentModels.shortPants.mtl || null}
+              textureUrl={currentModels.shortPants.tex || null}
               showShortPants={showShortPants}
               modelType="shortPants"
             />
@@ -104,7 +107,8 @@ const Scene = ({
         <ErrorBoundary>
           <AvatarModel
             modelUrl={currentModels.shirt.obj}
-            textureUrl={currentModels.shirt.tex}
+            mtlUrl={currentModels.shirt.mtl || null}
+            textureUrl={currentModels.shirt.tex || null}
             showShirt={showShirt}
             modelType="shirt"
           />
@@ -118,7 +122,8 @@ const Scene = ({
           <ErrorBoundary>
             <AvatarModel
               modelUrl={currentModels.skirt.obj}
-              textureUrl={currentModels.skirt.tex}
+              mtlUrl={currentModels.skirt.mtl || null}
+              textureUrl={currentModels.skirt.tex || null}
               showSkirt={showSkirt}
               modelType="skirt"
             />

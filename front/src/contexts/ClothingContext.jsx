@@ -1,4 +1,4 @@
-// src/contexts/ClothingContext.js
+// src/contexts/ClothingContext.jsx
 
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { addFitting, removeFitting } from '../services/api';
@@ -29,33 +29,10 @@ export const ClothingProvider = ({ children }) => {
   const toast = useToast();
 
   /**
-   * clo_3d 배열을 객체로 변환하는 함수
-   * @param {Array} clo3DArray - clo_3d 데이터 배열
-   * @returns {Object} clo3DObject - 변환된 clo_3d 객체
-   */
-  const transformClo3DArrayToObject = (clo3DArray) => {
-    const clo3DObject = {};
-    clo3DArray.forEach((item) => {
-      clo3DObject[item.type] = {
-        obj: item.obj,
-        tex: item.tex || null,
-        mtl: item.mtl || null,
-      };
-    });
-    return clo3DObject;
-  };
-
-  /**
    * 의류 상태 업데이트 함수 메모이제이션
    */
   const updateClothing = useCallback((newClothing) => {
     console.log('Clothing to update:', newClothing); // 로그 추가
-
-    // clo_3d가 배열인 경우 객체로 변환
-    if (newClothing.clo_3d && Array.isArray(newClothing.clo_3d)) {
-      newClothing.clo_3d = transformClo3DArrayToObject(newClothing.clo_3d);
-      console.log('Transformed clo_3d:', newClothing.clo_3d);
-    }
 
     setActiveClothing((prev) => ({
       ...prev,
@@ -65,13 +42,19 @@ export const ClothingProvider = ({ children }) => {
 
   /**
    * 의상을 착용하는 함수
-   * @param {string} type - 의류 타입 (예: 't-shirt')
+   * @param {string} type - 의류 타입 (예: 'tshirt')
    * @param {number} clo_idx - 의류 식별자
-   * @param {object} mtlData - MTL 데이터
+   * @param {string} clo_mtl_url - 의류 텍스처 URL
+   * @param {string} clo_name - 의류 이름
    */
   const wearClothing = useCallback(
-    async (type, clo_idx, mtlData) => {
-      console.log('Wearing clothing:', { type, clo_idx, mtlData }); // 로그 추가
+    async (type, clo_idx, clo_mtl_url, clo_name) => {
+      console.log('Wearing clothing:', {
+        type,
+        clo_idx,
+        clo_mtl_url,
+        clo_name,
+      }); // 로그 추가
 
       try {
         const response = await addFitting(activeClothing.avatarIndex, clo_idx);
@@ -79,44 +62,59 @@ export const ClothingProvider = ({ children }) => {
 
         setFittings((prev) => [...prev, response]); // 새로운 fitting 추가
 
+        // 의류 타입별 OBJ 파일 경로 설정
+        const objPathMap = {
+          't-shirt': '/models/tshirt.obj',
+          pants: '/models/pants.obj',
+          'short-pants': '/models/short-pants.obj',
+          shirt: '/models/shirt.obj',
+          skirt: '/models/skirt.obj',
+        };
+
+        const objUrl = objPathMap[type.toLowerCase()];
+
+        if (!objUrl) {
+          throw new Error(`지원하지 않는 의류 타입입니다: ${type}`);
+        }
+
         setActiveClothing((prev) => {
           const newState = { ...prev };
 
-          // 의류 타입에 따른 show 상태 업데이트
+          // 의류 타입에 따른 show 상태 및 clo_3d 업데이트
           switch (type.toLowerCase()) {
             case 't-shirt':
               newState.showClothing = true;
-              newState.clo_3d = {
-                ...newState.clo_3d,
-                tshirt: mtlData,
+              newState.clo_3d.tshirt = {
+                obj: objUrl,
+                tex: clo_mtl_url,
               };
               break;
             case 'pants':
               newState.showPants = true;
-              newState.clo_3d = {
-                ...newState.clo_3d,
-                pants: mtlData,
+              newState.clo_3d.pants = {
+                obj: objUrl,
+                tex: clo_mtl_url,
               };
               break;
             case 'short-pants':
               newState.showShortPants = true;
-              newState.clo_3d = {
-                ...newState.clo_3d,
-                shortPants: mtlData,
+              newState.clo_3d.shortPants = {
+                obj: objUrl,
+                tex: clo_mtl_url,
               };
               break;
             case 'shirt':
               newState.showShirt = true;
-              newState.clo_3d = {
-                ...newState.clo_3d,
-                shirt: mtlData,
+              newState.clo_3d.shirt = {
+                obj: objUrl,
+                tex: clo_mtl_url,
               };
               break;
             case 'skirt':
               newState.showSkirt = true;
-              newState.clo_3d = {
-                ...newState.clo_3d,
-                skirt: mtlData,
+              newState.clo_3d.skirt = {
+                obj: objUrl,
+                tex: clo_mtl_url,
               };
               break;
             default:
@@ -129,7 +127,7 @@ export const ClothingProvider = ({ children }) => {
 
         toast({
           title: '의상 착용 성공',
-          description: '의상이 성공적으로 착용되었습니다.',
+          description: `${clo_name}이(가) 성공적으로 착용되었습니다.`,
           status: 'success',
           duration: 3000,
           isClosable: true,
@@ -150,11 +148,12 @@ export const ClothingProvider = ({ children }) => {
 
   /**
    * 의상을 벗는 함수
-   * @param {string} type - 의류 타입 (예: 't-shirt')
+   * @param {string} type - 의류 타입 (예: 'tshirt')
+   * @param {string} clo_name - 의류 이름
    */
   const removeClothingFunc = useCallback(
-    async (type) => {
-      console.log('Removing clothing:', { type }); // 로그 추가
+    async (type, clo_name) => {
+      console.log('Removing clothing:', { type, clo_name }); // 로그 추가
 
       try {
         // 해당 타입의 fitting 찾기
@@ -180,42 +179,27 @@ export const ClothingProvider = ({ children }) => {
         setActiveClothing((prev) => {
           const newState = { ...prev };
 
-          // 의류 타입에 따른 show 상태 업데이트
+          // 의류 타입에 따른 show 상태 및 clo_3d 업데이트
           switch (type.toLowerCase()) {
             case 't-shirt':
               newState.showClothing = false;
-              newState.clo_3d = {
-                ...newState.clo_3d,
-                tshirt: null,
-              };
+              newState.clo_3d.tshirt = null;
               break;
-            case 'pants':
+            case 'pant':
               newState.showPants = false;
-              newState.clo_3d = {
-                ...newState.clo_3d,
-                pants: null,
-              };
+              newState.clo_3d.pants = null;
               break;
-            case 'short-pants':
+            case 'short-pant':
               newState.showShortPants = false;
-              newState.clo_3d = {
-                ...newState.clo_3d,
-                shortPants: null,
-              };
+              newState.clo_3d.shortPants = null;
               break;
             case 'shirt':
               newState.showShirt = false;
-              newState.clo_3d = {
-                ...newState.clo_3d,
-                shirt: null,
-              };
+              newState.clo_3d.shirt = null;
               break;
             case 'skirt':
               newState.showSkirt = false;
-              newState.clo_3d = {
-                ...newState.clo_3d,
-                skirt: null,
-              };
+              newState.clo_3d.skirt = null;
               break;
             default:
               break;
@@ -227,7 +211,7 @@ export const ClothingProvider = ({ children }) => {
 
         toast({
           title: '의상 제거 성공',
-          description: '의상이 성공적으로 제거되었습니다.',
+          description: `${clo_name}을(를) 성공적으로 제거했습니다.`,
           status: 'info',
           duration: 3000,
           isClosable: true,

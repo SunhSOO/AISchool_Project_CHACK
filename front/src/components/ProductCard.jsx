@@ -24,7 +24,7 @@ export const ProductCard = ({
   clo_name,
   clo_price,
   clo_desc,
-  clo_mtl,
+  clo_mtl_url, // 변경: clo_mtl -> clo_mtl_url
 }) => {
   const toast = useToast();
   const { addToCart } = useCart();
@@ -70,15 +70,37 @@ export const ProductCard = ({
       return;
     }
 
+    // clo_mtl_url 데이터 확인
+    console.log('Attempting to try on clothing:', {
+      clo_desc,
+      clo_idx,
+      clo_mtl_url,
+      clo_name,
+      isWearing,
+    });
+
+    if (!clo_mtl_url || typeof clo_mtl_url !== 'string') {
+      console.error('clo_mtl_url 데이터가 유효하지 않습니다:', clo_mtl_url);
+      toast({
+        title: '의상 착용 실패',
+        description: '의류 데이터가 손상되었습니다.',
+        status: 'error',
+        duration: 2000,
+        isClosable: true,
+        position: 'top',
+      });
+      return;
+    }
+
     debugLog('try-on-action', 'Trying on clothing:', {
       type: clo_desc,
-      mtlData: clo_mtl,
+      texUrl: clo_mtl_url,
       isWearing,
     });
 
     if (isWearing) {
       // 착용 중인 의상을 벗기
-      await removeClothing(clo_desc);
+      await removeClothing(clo_desc, clo_name);
       setIsWearing(false);
       toast({
         title: '의상 제거',
@@ -90,11 +112,11 @@ export const ProductCard = ({
       });
     } else {
       // 의상을 입기
-      await wearClothing(clo_desc, clo_idx, clo_mtl);
+      await wearClothing(clo_desc, clo_idx, clo_mtl_url, clo_name);
       setIsWearing(true);
       toast({
         title: '의상 착용',
-        description: `${clo_name}을(를) 착용합니다.`,
+        description: `${clo_name}을(를) 착용했습니다.`,
         status: 'success',
         duration: 2000,
         isClosable: true,
