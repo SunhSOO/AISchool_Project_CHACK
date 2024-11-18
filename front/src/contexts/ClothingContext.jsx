@@ -4,6 +4,8 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 import { addFitting, removeFitting } from '../services/api';
 import { useToast } from '@chakra-ui/react';
 
+// ClothingContext.jsx 파일 상단에 추가
+const API_URL = process.env.REACT_APP_API_URL || 'https://chack.ngrok.dev';
 const ClothingContext = createContext();
 
 export const ClothingProvider = ({ children }) => {
@@ -62,20 +64,13 @@ export const ClothingProvider = ({ children }) => {
 
         setFittings((prev) => [...prev, response]); // 새로운 fitting 추가
 
-        // 의류 타입별 OBJ 파일 경로 설정
-        const objPathMap = {
-          't-shirt': '/models/tshirt.obj',
-          pants: '/models/pants.obj',
-          'short-pants': '/models/short-pants.obj',
-          shirt: '/models/shirt.obj',
-          skirt: '/models/skirt.obj',
-        };
-
-        const objUrl = objPathMap[type.toLowerCase()];
-
-        if (!objUrl) {
-          throw new Error(`지원하지 않는 의류 타입입니다: ${type}`);
+        // 의류 타입별 OBJ 파일 경로 동적 설정
+        const { avatarIndex, gender } = activeClothing;
+        if (avatarIndex === null) {
+          throw new Error('avatarIndex가 설정되지 않았습니다.');
         }
+
+        const objUrl = `${API_URL}/files/fittings/garment_${avatarIndex}_${gender}_${type.toLowerCase()}.obj`;
 
         setActiveClothing((prev) => {
           const newState = { ...prev };
@@ -143,7 +138,7 @@ export const ClothingProvider = ({ children }) => {
         });
       }
     },
-    [activeClothing.avatarIndex, toast]
+    [activeClothing.avatarIndex, activeClothing.gender, activeClothing, toast]
   );
 
   /**
@@ -185,11 +180,11 @@ export const ClothingProvider = ({ children }) => {
               newState.showClothing = false;
               newState.clo_3d.tshirt = null;
               break;
-            case 'pant':
+            case 'pants':
               newState.showPants = false;
               newState.clo_3d.pants = null;
               break;
-            case 'short-pant':
+            case 'short-pants':
               newState.showShortPants = false;
               newState.clo_3d.shortPants = null;
               break;

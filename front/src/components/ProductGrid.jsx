@@ -95,7 +95,7 @@ const ProductGrid = ({ selectedCategory }) => {
               clo_name={product.clo_name}
               clo_price={product.clo_price}
               clo_desc={product.clo_desc}
-              clo_mtl={product.clo_mtl}
+              clo_mtl_url={product.clo_mtl_url} // 변경
             />
           </GridItem>
         ))}

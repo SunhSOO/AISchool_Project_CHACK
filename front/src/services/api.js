@@ -129,7 +129,9 @@ export const uploadImage = async (imageFile) => {
   });
 
   if (!response.ok) {
-    throw new Error('이미지 업로드 실패');
+    const errorResponse = await response.text(); // 서버 응답 확인
+    console.error('업로드 실패:', response.status, errorResponse);
+    throw new Error(`이미지 업로드 실패: ${response.status}`);
   }
 
   return response.json();

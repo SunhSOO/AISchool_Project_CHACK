@@ -1,29 +1,16 @@
-// src/components/AvatarModel.jsx
-
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
-import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
 import { TextureLoader } from 'three';
 import * as THREE from 'three';
 import PropTypes from 'prop-types';
 import { Box, Text } from '@chakra-ui/react';
+import { extend } from '@react-three/fiber';
 
-/**
- * AvatarModel 컴포넌트
- * @param {string} modelUrl - OBJ 파일의 URL
- * @param {string} textureUrl - 텍스처 이미지의 URL (선택 사항)
- * @param {string} mtlUrl - MTL 파일의 URL (선택 사항)
- * @param {boolean} showClothing - 의류를 표시할지 여부
- * @param {boolean} showPants - Pants 표시 여부
- * @param {boolean} showShortPants - ShortPants 표시 여부
- * @param {boolean} showShirt - Shirt 표시 여부
- * @param {boolean} showSkirt - Skirt 표시 여부
- * @param {string} modelType - 의류 타입 (예: 'shirt', 'pants' 등)
- */
+extend({ Object3D: THREE.Object3D });
+
 const AvatarModel = ({
   modelUrl,
   textureUrl,
-  mtlUrl,
   showClothing = false,
   showPants = false,
   showShortPants = false,
@@ -36,41 +23,32 @@ const AvatarModel = ({
   const [error, setError] = useState(null);
   const materialCache = useRef({});
 
-  /**
-   * UV 좌표 생성 함수
-   * 만약 geometry에 UV 좌표가 없다면 자동으로 생성
-   * @param {THREE.BufferGeometry} geometry
-   * @returns {THREE.BufferGeometry}
-   */
   const generateUVs = (geometry) => {
-    const positions = geometry.attributes.position;
-    const uvs = [];
-    const bbox = new THREE.Box3();
-    bbox.setFromBufferAttribute(positions);
+    if (!geometry.attributes.uv) {
+      const positions = geometry.attributes.position;
+      const uvs = [];
+      const bbox = new THREE.Box3();
+      bbox.setFromBufferAttribute(positions);
 
-    const size = new THREE.Vector3();
-    bbox.getSize(size);
+      const size = new THREE.Vector3();
+      bbox.getSize(size);
 
-    for (let i = 0; i < positions.count; i++) {
-      const x = positions.getX(i);
-      const y = positions.getY(i);
+      for (let i = 0; i < positions.count; i++) {
+        const x = positions.getX(i);
+        const y = positions.getY(i);
 
-      const u = (x - bbox.min.x) / size.x;
-      const v = (y - bbox.min.y) / size.y;
+        const u = (x - bbox.min.x) / size.x;
+        const v = (y - bbox.min.y) / size.y;
 
-      uvs.push(u, v);
+        uvs.push(u, v);
+      }
+
+      geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
     }
-
-    geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
     return geometry;
   };
 
-  /**
-   * 텍스처 로딩 및 재질 생성 함수
-   * @param {string} texUrl - 텍스처 URL
-   * @returns {THREE.MeshPhysicalMaterial | THREE.MeshStandardMaterial}
-   */
-  const getMaterial = (texUrl) => {
+  const getMaterial = useCallback((texUrl) => {
     if (materialCache.current[texUrl]) {
       return materialCache.current[texUrl];
     }
@@ -81,39 +59,22 @@ const AvatarModel = ({
       undefined,
       (err) => {
         console.error(`Texture loading failed for ${texUrl}:`, err);
-        // 폴백 텍스처 로드
-        const fallbackTexture = new TextureLoader().load(
-          `${process.env.PUBLIC_URL}/textures/default.png`,
-          undefined,
-          undefined,
-          (fallbackErr) => {
-            console.error('Fallback texture loading failed:', fallbackErr);
-          }
-        );
-        fallbackTexture.colorSpace = THREE.SRGBColorSpace;
-        fallbackTexture.minFilter = THREE.LinearFilter;
-        fallbackTexture.magFilter = THREE.LinearFilter;
-        fallbackTexture.flipY = false;
-
-        const fallbackMaterial = new THREE.MeshPhysicalMaterial({
-          map: fallbackTexture,
+        const defaultMaterial = new THREE.MeshStandardMaterial({
+          color: 0xcccccc,
+          roughness: 0.7,
+          metalness: 0.0,
           side: THREE.DoubleSide,
-          transparent: true,
-          depthWrite: false,
-          depthTest: true,
         });
-
-        materialCache.current[texUrl] = fallbackMaterial;
+        materialCache.current[texUrl] = defaultMaterial;
       }
     );
 
-    // sRGBColorSpace 및 필터 설정
     texture.colorSpace = THREE.SRGBColorSpace;
     texture.minFilter = THREE.LinearFilter;
     texture.magFilter = THREE.LinearFilter;
     texture.flipY = false;
 
-    const material = new THREE.MeshPhysicalMaterial({
+    const material = new THREE.MeshStandardMaterial({
       map: texture,
       side: THREE.DoubleSide,
       transparent: true,
@@ -123,17 +84,10 @@ const AvatarModel = ({
 
     materialCache.current[texUrl] = material;
     return material;
-  };
+  }, []);
 
-  /**
-   * 단일 모델 로드 함수
-   * @param {string} url - OBJ 파일 URL
-   * @param {string|null} texUrl - 텍스처 URL
-   * @param {string|null} mtlUrl - MTL 파일 URL
-   * @returns {Promise<THREE.Object3D | null>}
-   */
   const loadSingleModel = useCallback(
-    async (url, texUrl = null, mtlUrl = null) => {
+    async (url, texUrl = null) => {
       if (!url) {
         console.warn(`Model URL is null for modelType: ${modelType}`);
         return null;
@@ -142,55 +96,19 @@ const AvatarModel = ({
       console.log('Loading model:', { url, modelType });
 
       const objLoader = new OBJLoader();
-      const mtlLoader = new MTLLoader();
 
       try {
-        let materials = null;
-        if (mtlUrl) {
-          try {
-            materials = await new Promise((resolve, reject) => {
-              mtlLoader.load(
-                mtlUrl,
-                (loadedMaterials) => {
-                  loadedMaterials.preload();
-                  resolve(loadedMaterials);
-                },
-                undefined,
-                (error) => {
-                  console.error(
-                    `Failed to load MTL file from ${mtlUrl}:`,
-                    error
-                  );
-                  resolve(null); // Continue without materials
-                }
-              );
-            });
-            if (materials) {
-              objLoader.setMaterials(materials);
-              console.log(`Successfully loaded MTL for ${modelType}`);
-            }
-          } catch (err) {
-            console.warn('MTL loading failed:', err);
-            materials = null;
-          }
-        }
-
         const obj = await new Promise((resolve, reject) => {
           objLoader.load(
             url,
             (loadedObj) => {
               loadedObj.traverse((child) => {
                 if (child instanceof THREE.Mesh) {
-                  if (!child.geometry.attributes.uv) {
-                    child.geometry = generateUVs(child.geometry);
-                  }
+                  child.geometry = generateUVs(child.geometry);
+                  child.geometry.computeVertexNormals();
 
                   if (texUrl) {
                     child.material = getMaterial(texUrl);
-                  } else if (materials) {
-                    // MTL 로드 성공 시
-                    child.material =
-                      materials.materials[Object.keys(materials.materials)[0]];
                   } else {
                     child.material = new THREE.MeshStandardMaterial({
                       color: 0xcccccc,
@@ -200,11 +118,16 @@ const AvatarModel = ({
                     });
                   }
 
-                  if (modelType === 'shirt' || modelType === 'upperClothing') {
-                    child.renderOrder = 1;
-                  } else {
-                    child.renderOrder = 2;
-                  }
+                  // 렌더링 순서 설정
+                  child.renderOrder =
+                    modelType === 'body'
+                      ? 0
+                      : modelType === 'shirt' || modelType === 'upperClothing'
+                      ? 1
+                      : 2;
+
+                  child.castShadow = true;
+                  child.receiveShadow = true;
                 }
               });
               console.log(`Successfully loaded OBJ for ${modelType}`);
@@ -225,7 +148,7 @@ const AvatarModel = ({
         return null;
       }
     },
-    [modelType]
+    [modelType, getMaterial]
   );
 
   useEffect(() => {
@@ -235,14 +158,13 @@ const AvatarModel = ({
 
     const loadModel = async () => {
       try {
-        const loadedModel = await loadSingleModel(modelUrl, textureUrl, mtlUrl);
+        const loadedModel = await loadSingleModel(modelUrl, textureUrl);
         if (loadedModel && isMounted) {
-          loadedModel.traverse((child) => {
-            if (child instanceof THREE.Mesh) {
-              child.castShadow = true;
-              child.receiveShadow = true;
-            }
-          });
+          if (modelType === 'body') {
+            loadedModel.position.set(0, -0.9, 0);
+          }
+          loadedModel.scale.set(0.01, 0.01, 0.01);
+
           currentModel = loadedModel;
           setModel(loadedModel);
           setError(null);
@@ -268,8 +190,12 @@ const AvatarModel = ({
             if (child.geometry) child.geometry.dispose();
             if (child.material) {
               if (Array.isArray(child.material)) {
-                child.material.forEach((material) => material.dispose());
+                child.material.forEach((material) => {
+                  if (material.map) material.map.dispose();
+                  material.dispose();
+                });
               } else {
+                if (child.material.map) child.material.map.dispose();
                 child.material.dispose();
               }
             }
@@ -277,21 +203,17 @@ const AvatarModel = ({
         });
       }
     };
-  }, [modelUrl, textureUrl, mtlUrl, loadSingleModel, modelType]);
+  }, [modelUrl, textureUrl, loadSingleModel, modelType]);
 
-  /**
-   * 모델 렌더링 여부 결정 함수
-   * @returns {boolean}
-   */
   const shouldRenderModel = () => {
     switch (modelType) {
       case 'body':
         return true;
       case 'tshirt':
         return showClothing;
-      case 'pants':
+      case 'pant':
         return showPants;
-      case 'shortPants':
+      case 'shortPant':
         return showShortPants;
       case 'shirt':
         return showShirt;
@@ -302,7 +224,6 @@ const AvatarModel = ({
     }
   };
 
-  // 전달된 props 확인을 위한 로그
   useEffect(() => {
     console.log(
       `AvatarModel Props - modelType: ${modelType}, showClothing: ${showClothing}, showPants: ${showPants}, showShortPants: ${showShortPants}, showShirt: ${showShirt}, showSkirt: ${showSkirt}`
@@ -329,13 +250,36 @@ const AvatarModel = ({
     return null;
   }
 
-  return <group ref={groupRef}>{model && <primitive object={model} />}</group>;
+  return (
+    <group ref={groupRef}>
+      {model && (
+        <group>
+          {model.children.map((child, index) => {
+            if (child instanceof THREE.Mesh) {
+              return (
+                <mesh
+                  key={index}
+                  geometry={child.geometry}
+                  material={child.material}
+                  position={child.position}
+                  rotation={child.rotation}
+                  scale={child.scale}
+                  castShadow
+                  receiveShadow
+                />
+              );
+            }
+            return null;
+          })}
+        </group>
+      )}
+    </group>
+  );
 };
 
 AvatarModel.propTypes = {
   modelUrl: PropTypes.string.isRequired,
   textureUrl: PropTypes.string,
-  mtlUrl: PropTypes.string,
   showClothing: PropTypes.bool,
   showPants: PropTypes.bool,
   showShortPants: PropTypes.bool,
