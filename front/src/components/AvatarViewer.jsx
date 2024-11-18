@@ -140,19 +140,19 @@ const AvatarViewer = () => {
           <HStack spacing={2}>
             <Button
               size="sm"
-              colorScheme={activeClothing.showPants ? 'green' : 'gray'}
-              onClick={() => toggleClothing('Pants')}
+              colorScheme={activeClothing.showPant ? 'green' : 'gray'}
+              onClick={() => toggleClothing('Pant')}
             >
-              {activeClothing.showPants ? 'Pants 끄기' : 'Pants 켜기'}
+              {activeClothing.showPant ? 'Pant 끄기' : 'Pant 켜기'}
             </Button>
             <Button
               size="sm"
-              colorScheme={activeClothing.showShortPants ? 'green' : 'gray'}
-              onClick={() => toggleClothing('ShortPants')}
+              colorScheme={activeClothing.showShortPant ? 'green' : 'gray'}
+              onClick={() => toggleClothing('ShortPant')}
             >
-              {activeClothing.showShortPants
-                ? 'Short Pants 끄기'
-                : 'Short Pants 켜기'}
+              {activeClothing.showShortPant
+                ? 'Short Pant 끄기'
+                : 'Short Pant 켜기'}
             </Button>
           </HStack>
           {activeClothing.gender === 'female' && (
@@ -200,8 +200,8 @@ const AvatarViewer = () => {
           <Scene
             showAvatar={true}
             showClothing={activeClothing.showClothing}
-            showPants={activeClothing.showPants}
-            showShortPants={activeClothing.showShortPants}
+            showPant={activeClothing.showPant}
+            showShortPant={activeClothing.showShortPant}
             showShirt={activeClothing.showShirt}
             showSkirt={activeClothing.showSkirt}
             gender={activeClothing.gender}

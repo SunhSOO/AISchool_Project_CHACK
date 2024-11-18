@@ -1,10 +1,7 @@
-// src/contexts/ClothingContext.jsx
-
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { addFitting, removeFitting } from '../services/api';
 import { useToast } from '@chakra-ui/react';
 
-// ClothingContext.jsx 파일 상단에 추가
 const API_URL = process.env.REACT_APP_API_URL || 'https://chack.ngrok.dev';
 const ClothingContext = createContext();
 
@@ -15,14 +12,14 @@ export const ClothingProvider = ({ children }) => {
     clo_3d: {
       body: null,
       tshirt: null,
-      pants: null,
+      pant: null,
       shirt: null,
-      shortPants: null,
+      shortPant: null,
       skirt: null,
     },
     showClothing: true,
-    showPants: false,
-    showShortPants: false,
+    showPant: true,
+    showShortPant: false,
     showShirt: false,
     showSkirt: false,
   });
@@ -44,10 +41,6 @@ export const ClothingProvider = ({ children }) => {
 
   /**
    * 의상을 착용하는 함수
-   * @param {string} type - 의류 타입 (예: 'tshirt')
-   * @param {number} clo_idx - 의류 식별자
-   * @param {string} clo_mtl_url - 의류 텍스처 URL
-   * @param {string} clo_name - 의류 이름
    */
   const wearClothing = useCallback(
     async (type, clo_idx, clo_mtl_url, clo_name) => {
@@ -56,15 +49,14 @@ export const ClothingProvider = ({ children }) => {
         clo_idx,
         clo_mtl_url,
         clo_name,
-      }); // 로그 추가
+      });
 
       try {
         const response = await addFitting(activeClothing.avatarIndex, clo_idx);
-        console.log('Fitting added:', response); // 로그 추가
+        console.log('Fitting added:', response);
 
-        setFittings((prev) => [...prev, response]); // 새로운 fitting 추가
+        setFittings((prev) => [...prev, { clo_name, ...response }]); // `clo_name`을 fittings에 추가
 
-        // 의류 타입별 OBJ 파일 경로 동적 설정
         const { avatarIndex, gender } = activeClothing;
         if (avatarIndex === null) {
           throw new Error('avatarIndex가 설정되지 않았습니다.');
@@ -79,44 +71,29 @@ export const ClothingProvider = ({ children }) => {
           switch (type.toLowerCase()) {
             case 't-shirt':
               newState.showClothing = true;
-              newState.clo_3d.tshirt = {
-                obj: objUrl,
-                tex: clo_mtl_url,
-              };
+              newState.clo_3d.tshirt = { obj: objUrl, tex: clo_mtl_url };
               break;
-            case 'pants':
-              newState.showPants = true;
-              newState.clo_3d.pants = {
-                obj: objUrl,
-                tex: clo_mtl_url,
-              };
+            case 'pant':
+              newState.showPant = true;
+              newState.clo_3d.pant = { obj: objUrl, tex: clo_mtl_url };
               break;
-            case 'short-pants':
-              newState.showShortPants = true;
-              newState.clo_3d.shortPants = {
-                obj: objUrl,
-                tex: clo_mtl_url,
-              };
+            case 'short-pant':
+              newState.showShortPant = true;
+              newState.clo_3d.shortPant = { obj: objUrl, tex: clo_mtl_url };
               break;
             case 'shirt':
               newState.showShirt = true;
-              newState.clo_3d.shirt = {
-                obj: objUrl,
-                tex: clo_mtl_url,
-              };
+              newState.clo_3d.shirt = { obj: objUrl, tex: clo_mtl_url };
               break;
             case 'skirt':
               newState.showSkirt = true;
-              newState.clo_3d.skirt = {
-                obj: objUrl,
-                tex: clo_mtl_url,
-              };
+              newState.clo_3d.skirt = { obj: objUrl, tex: clo_mtl_url };
               break;
             default:
               break;
           }
 
-          console.log('Updated activeClothing state:', newState); // 로그 추가
+          console.log('Updated activeClothing state:', newState);
           return newState;
         });
 
@@ -138,55 +115,51 @@ export const ClothingProvider = ({ children }) => {
         });
       }
     },
-    [activeClothing.avatarIndex, activeClothing.gender, activeClothing, toast]
+    [activeClothing.avatarIndex, activeClothing.gender, toast]
   );
 
   /**
    * 의상을 벗는 함수
-   * @param {string} type - 의류 타입 (예: 'tshirt')
-   * @param {string} clo_name - 의류 이름
    */
   const removeClothingFunc = useCallback(
     async (type, clo_name) => {
-      console.log('Removing clothing:', { type, clo_name }); // 로그 추가
+      console.log('Removing clothing:', { type, clo_name });
 
       try {
-        // 해당 타입의 fitting 찾기
-        const fittingToRemove = fittings.find((fitting) => {
-          return fitting.clo_desc.toLowerCase() === type.toLowerCase();
-        });
+        if (!type || typeof type !== 'string') {
+          throw new Error('유효하지 않은 의류 타입입니다.');
+        }
 
-        console.log('Fitting to remove:', fittingToRemove); // 로그 추가
+        const fittingToRemove = fittings.find(
+          (fitting) => fitting.clo_name === clo_name
+        );
 
         if (!fittingToRemove) {
           throw new Error('해당 의상이 현재 착용 중이지 않습니다.');
         }
 
         await removeFitting(fittingToRemove.fitting_idx);
-        console.log('Fitting removed:', fittingToRemove); // 로그 추가
+        console.log('Fitting removed:', fittingToRemove);
 
         setFittings((prev) =>
-          prev.filter(
-            (fitting) => fitting.fitting_idx !== fittingToRemove.fitting_idx
-          )
+          prev.filter((fitting) => fitting.clo_name !== clo_name)
         );
 
         setActiveClothing((prev) => {
           const newState = { ...prev };
 
-          // 의류 타입에 따른 show 상태 및 clo_3d 업데이트
           switch (type.toLowerCase()) {
             case 't-shirt':
               newState.showClothing = false;
               newState.clo_3d.tshirt = null;
               break;
-            case 'pants':
-              newState.showPants = false;
-              newState.clo_3d.pants = null;
+            case 'pant':
+              newState.showPant = false;
+              newState.clo_3d.pant = null;
               break;
-            case 'short-pants':
-              newState.showShortPants = false;
-              newState.clo_3d.shortPants = null;
+            case 'short-pant':
+              newState.showShortPant = false;
+              newState.clo_3d.shortPant = null;
               break;
             case 'shirt':
               newState.showShirt = false;
@@ -200,7 +173,7 @@ export const ClothingProvider = ({ children }) => {
               break;
           }
 
-          console.log('Updated activeClothing state after removal:', newState); // 로그 추가
+          console.log('Updated activeClothing state after removal:', newState);
           return newState;
         });
 
@@ -229,7 +202,7 @@ export const ClothingProvider = ({ children }) => {
     <ClothingContext.Provider
       value={{
         activeClothing,
-        updateClothing: updateClothing,
+        updateClothing,
         wearClothing,
         removeClothing: removeClothingFunc,
         fittings,
@@ -240,7 +213,6 @@ export const ClothingProvider = ({ children }) => {
   );
 };
 
-// useClothing 훅 정의
 export const useClothing = () => {
   const context = useContext(ClothingContext);
   if (!context) {

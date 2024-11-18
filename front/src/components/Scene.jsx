@@ -10,8 +10,8 @@ import { Box, Text } from '@chakra-ui/react';
 const Scene = ({
   showAvatar,
   showClothing,
-  showPants,
-  showShortPants,
+  showPant,
+  showShortPant,
   showShirt,
   showSkirt,
   gender,
@@ -23,8 +23,8 @@ const Scene = ({
   console.log('Scene rendering:', {
     showAvatar,
     showClothing,
-    showPants,
-    showShortPants,
+    showPant,
+    showShortPant,
     showShirt,
     showSkirt,
     gender,
@@ -55,6 +55,7 @@ const Scene = ({
       />
       <Environment preset="studio" />
 
+      {/* Body */}
       <ErrorBoundary>
         <AvatarModel
           modelUrl={currentModels.body.obj}
@@ -65,44 +66,7 @@ const Scene = ({
         />
       </ErrorBoundary>
 
-      {showClothing && currentModels.tshirt && currentModels.tshirt.obj && (
-        <ErrorBoundary>
-          <AvatarModel
-            modelUrl={currentModels.tshirt.obj}
-            mtlUrl={currentModels.tshirt.mtl || null}
-            textureUrl={currentModels.tshirt.tex || null}
-            showClothing={showClothing}
-            modelType="tshirt"
-          />
-        </ErrorBoundary>
-      )}
-
-      {showPants && currentModels.pants && currentModels.pants.obj && (
-        <ErrorBoundary>
-          <AvatarModel
-            modelUrl={currentModels.pants.obj}
-            mtlUrl={currentModels.pants.mtl || null}
-            textureUrl={currentModels.pants.tex || null}
-            showPants={showPants}
-            modelType="pants"
-          />
-        </ErrorBoundary>
-      )}
-
-      {showShortPants &&
-        currentModels.shortPants &&
-        currentModels.shortPants.obj && (
-          <ErrorBoundary>
-            <AvatarModel
-              modelUrl={currentModels.shortPants.obj}
-              mtlUrl={currentModels.shortPants.mtl || null}
-              textureUrl={currentModels.shortPants.tex || null}
-              showShortPants={showShortPants}
-              modelType="shortPants"
-            />
-          </ErrorBoundary>
-        )}
-
+      {/* Shirt */}
       {showShirt && currentModels.shirt && currentModels.shirt.obj && (
         <ErrorBoundary>
           <AvatarModel
@@ -115,6 +79,48 @@ const Scene = ({
         </ErrorBoundary>
       )}
 
+      {/* T-shirt */}
+      {showClothing && currentModels.tshirt && currentModels.tshirt.obj && (
+        <ErrorBoundary>
+          <AvatarModel
+            modelUrl={currentModels.tshirt.obj}
+            mtlUrl={currentModels.tshirt.mtl || null}
+            textureUrl={currentModels.tshirt.tex || null}
+            showClothing={showClothing}
+            modelType="tshirt"
+          />
+        </ErrorBoundary>
+      )}
+
+      {/* Pant */}
+      {showPant && currentModels.pant && currentModels.pant.obj && (
+        <ErrorBoundary>
+          <AvatarModel
+            modelUrl={currentModels.pant.obj}
+            mtlUrl={currentModels.pant.mtl || null}
+            textureUrl={currentModels.pant.tex || null}
+            showPant={showPant}
+            modelType="pant"
+          />
+        </ErrorBoundary>
+      )}
+
+      {/* Short Pant */}
+      {showShortPant &&
+        currentModels.shortPant &&
+        currentModels.shortPant.obj && (
+          <ErrorBoundary>
+            <AvatarModel
+              modelUrl={currentModels.shortPant.obj}
+              mtlUrl={currentModels.shortPant.mtl || null}
+              textureUrl={currentModels.shortPant.tex || null}
+              showShortPant={showShortPant}
+              modelType="shortPant"
+            />
+          </ErrorBoundary>
+        )}
+
+      {/* Skirt */}
       {gender === 'female' &&
         showSkirt &&
         currentModels.skirt &&
@@ -136,8 +142,8 @@ const Scene = ({
 Scene.propTypes = {
   showAvatar: PropTypes.bool,
   showClothing: PropTypes.bool,
-  showPants: PropTypes.bool,
-  showShortPants: PropTypes.bool,
+  showPant: PropTypes.bool,
+  showShortPant: PropTypes.bool,
   showShirt: PropTypes.bool,
   showSkirt: PropTypes.bool,
   gender: PropTypes.string.isRequired,

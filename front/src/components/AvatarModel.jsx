@@ -12,8 +12,8 @@ const AvatarModel = ({
   modelUrl,
   textureUrl,
   showClothing = false,
-  showPants = false,
-  showShortPants = false,
+  showPant = false,
+  showShortPant = false,
   showShirt = false,
   showSkirt = false,
   modelType = 'body',
@@ -212,9 +212,9 @@ const AvatarModel = ({
       case 'tshirt':
         return showClothing;
       case 'pant':
-        return showPants;
+        return showPant;
       case 'shortPant':
-        return showShortPants;
+        return showShortPant;
       case 'shirt':
         return showShirt;
       case 'skirt':
@@ -226,16 +226,9 @@ const AvatarModel = ({
 
   useEffect(() => {
     console.log(
-      `AvatarModel Props - modelType: ${modelType}, showClothing: ${showClothing}, showPants: ${showPants}, showShortPants: ${showShortPants}, showShirt: ${showShirt}, showSkirt: ${showSkirt}`
+      `AvatarModel Props - modelType: ${modelType}, showClothing: ${showClothing}, showPant: ${showPant}, showShortPant: ${showShortPant}, showShirt: ${showShirt}, showSkirt: ${showSkirt}`
     );
-  }, [
-    modelType,
-    showClothing,
-    showPants,
-    showShortPants,
-    showShirt,
-    showSkirt,
-  ]);
+  }, [modelType, showClothing, showPant, showShortPant, showShirt, showSkirt]);
 
   if (error) {
     return (
@@ -281,8 +274,8 @@ AvatarModel.propTypes = {
   modelUrl: PropTypes.string.isRequired,
   textureUrl: PropTypes.string,
   showClothing: PropTypes.bool,
-  showPants: PropTypes.bool,
-  showShortPants: PropTypes.bool,
+  showPant: PropTypes.bool,
+  showShortPant: PropTypes.bool,
   showShirt: PropTypes.bool,
   showSkirt: PropTypes.bool,
   modelType: PropTypes.string,

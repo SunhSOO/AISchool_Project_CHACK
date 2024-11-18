@@ -32,8 +32,8 @@ const ProductGrid = ({ selectedCategory }) => {
                 return type === 't-shirt';
               case 'Shirt':
                 return type === 'shirt';
-              case 'Pants':
-                return type === 'pants' || type === 'short-pants';
+              case 'Pant':
+                return type === 'pant' || type === 'short-pant';
               case 'Skirt':
                 return type === 'skirt';
               default:

@@ -78,20 +78,20 @@ export const getAvatarData = async () => {
       obj:
         targetAvatar.fitting_urls.find((url) => url.includes(`_${type}.obj`)) ||
         null,
-      tex: targetAvatar.fitting_urls.find((url) => url.includes(`_${type}.png`))
-        ? `${baseTextureUrl}/${type}.png`
-        : null,
-      mtl: targetAvatar.fitting_urls.find((url) => url.includes(`_${type}.mtl`))
-        ? `${baseTextureUrl}/${type}.mtl`
-        : null,
+      tex:
+        targetAvatar.fitting_urls.find((url) => url.includes(`_${type}.png`)) ||
+        null,
+      mtl:
+        targetAvatar.fitting_urls.find((url) => url.includes(`_${type}.mtl`)) ||
+        null,
     });
 
     const modelPaths = {
       body: { obj: targetAvatar.avatar_url, tex: null, mtl: null },
       tshirt: findAsset('t-shirt'),
-      pants: findAsset('pant'),
+      pant: findAsset('pant'),
       shirt: findAsset('shirt'),
-      shortPants: findAsset('short-pant'),
+      shortPant: findAsset('short-pant'),
       skirt: gender === 'female' ? findAsset('skirt') : null,
     };
 
@@ -120,7 +120,7 @@ export const uploadImage = async (imageFile) => {
     throw new Error('인증 토큰이 없습니다.');
   }
 
-  const response = await fetch(`${API_URL}/uploads/avatars/images`, {
+  const response = await fetch(`${API_URL}/uploads/avatars/images/`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
