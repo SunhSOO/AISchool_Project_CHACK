@@ -58,11 +58,11 @@ export const getAvatarData = async () => {
     debugLog('Fetched avatars:', avatars);
 
     const userData = await getCurrentUser();
-    const userId = Number(userData.user_id);
+    const userId = String(userData.user_id);
     const gender = mapGender(userData.user_gender);
 
     const targetAvatar = avatars.find(
-      (avatar) => Number(avatar.user_id) === userId
+      (avatar) => String(avatar.user_id) === userId
     );
     if (!targetAvatar) {
       throw new Error('해당 아바타를 찾을 수 없습니다.');

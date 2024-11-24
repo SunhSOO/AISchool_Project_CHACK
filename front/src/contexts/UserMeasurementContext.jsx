@@ -1,4 +1,3 @@
-// src/contexts/UserMeasurementContext.jsx
 import React, { createContext, useContext, useState } from 'react';
 
 const UserMeasurementContext = createContext();
@@ -7,8 +6,11 @@ export const UserMeasurementProvider = ({ children }) => {
   const [measurements, setMeasurements] = useState({
     height: '',
     weight: '',
-    avatarIndex: 28,
-    gender: 'female',
+    avatarIndex: null,
+    gender: 'F', // 기본값을 'F'로 설정
+    chestCircumference: '',
+    waistCircumference: '',
+    hipCircumference: '',
     isAvatarGenerated: false,
     recommendedSize: null,
   });

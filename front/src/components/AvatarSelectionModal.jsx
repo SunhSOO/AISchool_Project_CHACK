@@ -9,63 +9,25 @@ import {
   ModalBody,
   ModalFooter,
   Button,
-  VStack,
-  Image,
+  Text,
 } from '@chakra-ui/react';
 import PropTypes from 'prop-types';
+import AvatarViewer from './AvatarViewer';
 
-const AvatarSelectionModal = ({ isOpen, onClose }) => {
-  const avatars = [
-    {
-      id: 1,
-      name: '아바타 1',
-      imageUrl: '/avatars/avatar1.png',
-    },
-    {
-      id: 2,
-      name: '아바타 2',
-      imageUrl: '/avatars/avatar2.png',
-    },
-    // 더 많은 아바타...
-  ];
-
-  const handleSelect = (avatar) => {
-    console.log('선택한 아바타:', avatar);
-    onClose();
-  };
-
+const AvatarSelectionModal = ({ isOpen, onClose, avatarIndex }) => {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="lg" isCentered>
+    <Modal isOpen={isOpen} onClose={onClose} size="xl" isCentered>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>아바타 선택</ModalHeader>
+        <ModalHeader>아바타 확인</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <VStack spacing={4}>
-            {avatars.map((avatar) => (
-              <Button
-                key={avatar.id}
-                variant="outline"
-                width="100%"
-                onClick={() => handleSelect(avatar)}
-                leftIcon={
-                  <Image
-                    src={avatar.imageUrl}
-                    alt={avatar.name}
-                    boxSize="24px"
-                  />
-                }
-                justifyContent="flex-start"
-              >
-                {avatar.name}
-              </Button>
-            ))}
-          </VStack>
+          <Text mb={4}>생성된 아바타가 정확한지 확인해주세요.</Text>
+          <AvatarViewer avatarIndex={avatarIndex} />
         </ModalBody>
-
         <ModalFooter>
           <Button colorScheme="blue" mr={3} onClick={onClose}>
-            닫기
+            확인
           </Button>
         </ModalFooter>
       </ModalContent>
@@ -76,6 +38,7 @@ const AvatarSelectionModal = ({ isOpen, onClose }) => {
 AvatarSelectionModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
+  avatarIndex: PropTypes.number.isRequired,
 };
 
 export default AvatarSelectionModal;

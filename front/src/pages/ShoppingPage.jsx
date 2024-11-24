@@ -49,7 +49,7 @@ const ShoppingPage = () => {
           _hover={{ bg: 'gray.200' }}
           borderRadius="3xl"
         >
-          <Text fontWeight="medium">아바타 뷰어</Text>
+          <Text fontWeight="medium">Avatar View</Text>
           <IconButton
             icon={isAvatarExpanded ? <ChevronUp /> : <ChevronDown />}
             variant="ghost"

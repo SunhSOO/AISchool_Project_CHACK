@@ -123,38 +123,180 @@
 
 // export default MeasurementForm;
 // src/components/MeasurementForm.jsx
-import React from 'react';
-import { Box, VStack, Button, Text } from '@chakra-ui/react';
+
+// src/components/MeasurementForm.jsx
+// src/components/MeasurementForm.jsx
+import React, { useState } from 'react';
+import {
+  Box,
+  VStack,
+  Button,
+  Text,
+  FormControl,
+  FormLabel,
+  NumberInput,
+  NumberInputField,
+  useToast,
+  useDisclosure,
+} from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { useMeasurements } from '../contexts/UserMeasurementContext';
+import AvatarSelectionModal from './AvatarSelectionModal';
 
 const MeasurementForm = () => {
-  const { updateMeasurements } = useMeasurements();
+  const { measurements, updateMeasurements } = useMeasurements();
   const navigate = useNavigate();
+  const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
-  // 다음 페이지로 이동하는 핸들러
-  const handleProceed = () => {
-    // 필요한 경우 컨텍스트 업데이트
-    updateMeasurements({
-      // 여기서 필요한 데이터를 업데이트할 수 있습니다.
-      isAvatarGenerated: true, // 예시로 아바타 생성 완료 표시
-    });
-    navigate('/shopping'); // 다음 페이지 경로로 변경하세요
+  const [chestCircumference, setChestCircumference] = useState(
+    measurements.chestCircumference || ''
+  );
+  const [waistCircumference, setWaistCircumference] = useState(
+    measurements.waistCircumference || ''
+  );
+  const [hipCircumference, setHipCircumference] = useState(
+    measurements.hipCircumference || ''
+  );
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  // 신체치수 업데이트 컨트롤러
+  const handleUpdateMeasurements = async () => {
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('인증 토큰이 없습니다. 다시 로그인해주세요.');
+      }
+
+      // FormData 객체 생성 및 데이터 추가
+      const formData = new FormData();
+      formData.append('chest_circumference', chestCircumference);
+      formData.append('waist_circumference', waistCircumference);
+      formData.append('hip_circumference', hipCircumference);
+
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/avatars/${measurements.avatarIndex}`,
+        {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${token}`, // FormData는 Content-Type을 자동 설정
+          },
+          body: formData, // FormData를 요청 본문에 추가
+        }
+      );
+
+      if (!response.ok) {
+        const responseText = await response.text();
+        let errorMessage;
+        try {
+          const errorData = JSON.parse(responseText);
+          errorMessage = errorData.detail || '업데이트 실패';
+        } catch (e) {
+          errorMessage = '서버 응답 처리 중 오류가 발생했습니다';
+        }
+        throw new Error(errorMessage);
+      }
+
+      const result = await response.json();
+      console.log('Update Result:', result);
+
+      updateMeasurements({
+        chestCircumference: result.chest_circumference,
+        waistCircumference: result.waist_circumference,
+        hipCircumference: result.hip_circumference,
+        isAvatarGenerated: true,
+      });
+
+      toast({
+        title: '업데이트 성공',
+        description: '측정값이 성공적으로 업데이트되었습니다.',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+
+      // 모달 열기
+      onOpen();
+    } catch (err) {
+      console.error('Update error:', err);
+      toast({
+        title: '업데이트 실패',
+        description: err.message || '알 수 없는 오류가 발생했습니다.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 모달에서 확인 버튼을 누르면 쇼핑 페이지로 이동
+  const handleConfirm = () => {
+    onClose();
+    navigate('/shopping'); // 쇼핑 페이지로 이동
   };
 
   return (
     <Box maxW="500px" p={4} mx="auto" fontFamily="Pretendard" mt={20}>
       <VStack spacing={6} align="center">
         <Text fontSize="2xl" fontWeight="bold">
-          신체 정보
+          신체 치수 확인 및 수정
         </Text>
-        <Text fontSize="lg">
-          측정값 입력을 생략하고 다음 페이지로 이동합니다.
-        </Text>
-        <Button colorScheme="blue" onClick={handleProceed}>
+
+        <FormControl id="chestCircumference">
+          <FormLabel>가슴둘레 (cm)</FormLabel>
+          <NumberInput
+            value={chestCircumference}
+            onChange={(valueString) => setChestCircumference(valueString)}
+            min={50}
+            max={150}
+          >
+            <NumberInputField placeholder="가슴둘레를 입력하세요" />
+          </NumberInput>
+        </FormControl>
+
+        <FormControl id="waistCircumference">
+          <FormLabel>허리둘레 (cm)</FormLabel>
+          <NumberInput
+            value={waistCircumference}
+            onChange={(valueString) => setWaistCircumference(valueString)}
+            min={40}
+            max={130}
+          >
+            <NumberInputField placeholder="허리둘레를 입력하세요" />
+          </NumberInput>
+        </FormControl>
+
+        <FormControl id="hipCircumference">
+          <FormLabel>엉덩이둘레 (cm)</FormLabel>
+          <NumberInput
+            value={hipCircumference}
+            onChange={(valueString) => setHipCircumference(valueString)}
+            min={50}
+            max={150}
+          >
+            <NumberInputField placeholder="엉덩이둘레를 입력하세요" />
+          </NumberInput>
+        </FormControl>
+
+        <Button
+          colorScheme="blue"
+          onClick={handleUpdateMeasurements}
+          isLoading={isLoading}
+        >
           다음으로 이동
         </Button>
       </VStack>
+
+      {/* 아바타 확인 모달 */}
+      <AvatarSelectionModal
+        isOpen={isOpen}
+        onClose={handleConfirm}
+        avatarIndex={measurements.avatarIndex}
+      />
     </Box>
   );
 };
